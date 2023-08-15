@@ -78,11 +78,11 @@ def eval_expr(kb: KnowledgeBaseDAG, facts, tokens):
         result = eval_expr(kb, facts, tokens)
         while tokens[0] != ")":
             t = tokens.pop(0).strip()
-            if t == "+":
+            if t == OP_AND:
                 result = result and eval_expr(kb, facts, tokens)
-            elif t == "|":
+            elif t == OP_OR:
                 result = result or eval_expr(kb, facts, tokens)
-            elif t == "^":
+            elif t == OP_XOR:
                 result = result != eval_expr(kb, facts, tokens)
         del tokens[0]
         return result
