@@ -67,21 +67,31 @@ OP_XOR = "^"
 
 
 def eval_expr(kb: KnowledgeBaseDAG, facts, tokens):
+    if not tokens:
+        return False
+
     token = tokens.pop(0).strip()
 
     if token == "!":
         return not eval_expr(kb, facts, tokens)
-    elif token == OP_AND:
-        return eval_expr(kb, facts, tokens) and eval_expr(kb, facts, tokens)
-    elif token == OP_OR:
-        return eval_expr(kb, facts, tokens) or eval_expr(kb, facts, tokens)
-    elif token == OP_XOR:
-        return eval_expr(kb, facts, tokens) != eval_expr(kb, facts, tokens)
-
-    fact_negated = kb.is_fact_negated(token)
-    fact_added = token in facts
-
-    return not fact_negated if fact_added else False
+    elif token == "(":
+        result = eval_expr(kb, facts, tokens)
+        while tokens[0] != ")":
+            t = tokens.pop(0).strip()
+            if t == "+":
+                result = result and eval_expr(kb, facts, tokens)
+            elif t == "|":
+                result = result or eval_expr(kb, facts, tokens)
+            elif t == "^":
+                result = result != eval_expr(kb, facts, tokens)
+        del tokens[0]
+        return result
+    else:
+        token_value = token in facts
+        if kb.is_fact_negated(token):
+            return not token_value
+        else:
+            return token_value
 
 
 def evaluate_condition(kb: KnowledgeBaseDAG, facts: str, condition: str) -> str:
