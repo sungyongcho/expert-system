@@ -22,17 +22,54 @@
 # # facts = {'D', 'E', 'I', 'J', 'O', 'P'}
 
 
-rule = {'A': ['B'],
-        'B': ['A']}
+# rule = {'A': ['B'],
+#         'B': ['A']}
 
-# facts = {'B'}
-facts = {'A'}
+# # facts = {'B'}
+# facts = {'A'}
+
+
+# rule = {'A': ['B', 'C', '!', '+']}
+
+# # facts = {}
+# # facts = {'B'}
+# # facts = {'C'}
+# facts = {'B', 'C'}
+
+
+# rule = {'A': ['B', 'C', '+'],
+#         'B': ['D', 'E', '|'],
+#         'C': ['B'],
+#         }
+
+# # facts = {}
+# # facts = {'D'}
+# # facts = {'E'}
+# facts = {'D', 'E'}
+
+
+rule = {'A': ['B', 'C', '+'],
+        'B': ['D', 'E', '^'],
+        'C': ['B']
+        }
+
+# facts = {}
+# facts = {'D'}
+# facts = {'E'}
+facts = {'D', 'E'}
 
 
 def process_elements(elements, rules, facts):
     stack = []
-    for element in elements:
-        if element == '+':
+    for index, element in enumerate(elements):
+        if element == '!':
+            # remove currently stored value in stack first,
+            next_element = stack.pop()
+            # and then run eval_expr again
+            next_element = elements[index - 1]
+            negation_result = not eval_expr(rules, facts, next_element)
+            stack.append(negation_result)
+        elif element == '+':
             right = stack.pop()
             left = stack.pop()
             result = left and right
@@ -87,4 +124,4 @@ def eval_query(rules, facts, queries):
     return results
 
 
-print(eval_query(rule, facts, "B"))
+print(eval_query(rule, facts, "A"))
