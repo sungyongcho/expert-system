@@ -1,5 +1,4 @@
 from functools import partial
-import sys
 import re
 from typing import Tuple, List, Dict
 
@@ -8,13 +7,17 @@ from collections import defaultdict
 
 class KnowledgeBaseDAG:
     def __init__(self):
-        self.graph = defaultdict(set)
+        self.graph = {}
         self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
         rule_tokens = tokenize_expr(rule)
-        rpn_tokens = convert_to_rpn(rule_tokens)
-        self.graph[result].add(tuple(rpn_tokens))
+        result_tokens = tokenize_expr(result)
+        rpn_expression = convert_to_rpn(rule_tokens)
+        rpn_result = convert_to_rpn(result_tokens)
+        # 키가 딕셔너리에 없으면 빈 set을 할당한 후 추가
+        if tuple(result_tokens) not in self.graph:
+            self.graph[tuple(rpn_result)] = tuple(rpn_expression)
 
     def update_fact(self, fact: str, negated: bool = False):
         self.negated[fact] = negated
@@ -28,8 +31,7 @@ class KnowledgeBaseDAG:
     def __str__(self):
         output = ""
         for key in self.graph:
-            rules = ", ".join(str(rule) for rule in self.graph[key])
-            output += f"{key} => {rules}\n"
+            output += f"{key} => {self.graph[key]}\n"
         return output
 
 
@@ -111,16 +113,3 @@ def convert_to_rpn(regex):
         rpn_tokens.append(operator_stack.pop())
 
     return ''.join(rpn_tokens)
-
-
-print(convert_to_rpn("!(F | G) + H"))  # 결과: 'FG|!H+'
-
-
-if __name__ == "__main__":
-    input_filename = sys.argv[1]
-    with open(input_filename, "r") as f:
-        input_lines = f.readlines()
-
-    rules, initial_facts, queries = parse_input(input_lines)
-    print("Current Knowledge Base:\n")
-    print(rules)

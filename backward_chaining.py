@@ -90,7 +90,7 @@ def process_elements(elements, rules, facts):
 
 
 def find_query_in_keys(rules, query):
-    for key_tuple in rules.keys():
+    for key_tuple, _ in rules.graph.items():
         if query in key_tuple:
             return key_tuple
     return None
@@ -100,14 +100,15 @@ def eval_expr(rules, facts, query):
     if query in facts:
         return True
 
-    if query in rules:
-        elements = rules[query]
-        return process_elements(elements, rules, facts)
+    # if query in rules:
+    #     elements = rules[query]
+    #     return process_elements(elements, rules, facts)
 
     key_tuple = find_query_in_keys(rules, query)
 
     if key_tuple:
-        elements = rules[key_tuple]
+        elements = rules.graph[key_tuple]
+        print(elements)
         return process_elements(elements, rules, facts)
 
     return False
@@ -124,4 +125,4 @@ def eval_query(rules, facts, queries):
     return results
 
 
-print(eval_query(rule, facts, "A"))
+# print(eval_query(rule, facts, "A"))
