@@ -64,7 +64,7 @@ def process_elements(elements, rules, facts):
     for index, element in enumerate(elements):
         if element == '!':
             # remove currently stored value in stack first,
-            next_element = stack.pop()
+            stack.pop()
             # and then run eval_expr again
             next_element = elements[index - 1]
             negation_result = not eval_expr(rules, facts, next_element)
