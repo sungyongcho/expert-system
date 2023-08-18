@@ -65,43 +65,7 @@ def parse_input(input_lines: List[str]) -> Tuple[KnowledgeBaseDAG, str, str]:
 OP_AND = "+"
 OP_OR = "|"
 OP_XOR = "^"
-
-
-def eval_expr(kb: KnowledgeBaseDAG, facts, tokens):
-    stack = []
-    for token in tokens:
-        if token == '+':
-            b = stack.pop()
-            a = stack.pop()
-            stack.append(a and b)
-        else:
-            stack.append(kb.is_fact_negated(token) or (token in facts))
-
-    return stack[0]
-
-
-def apply_rules(kb: KnowledgeBaseDAG, facts: str):
-    new_facts = set(facts)
-    changes = True
-
-    while changes:
-        changes = False
-        for rule, products in kb.graph.items():
-            if all(fact in new_facts for fact in rule):
-                for product in products:
-                    if product not in new_facts:
-                        new_facts.add(product)
-                        changes = True
-
-    return new_facts
-
-
-def evaluate_condition(kb: KnowledgeBaseDAG, facts: str, condition: str) -> str:
-    facts = apply_rules(kb, facts)
-    tokens = tokenize_expr(condition)
-    rpn_tokens = convert_to_rpn(tokens)
-    result = eval_expr(kb, facts, rpn_tokens)
-    return "T" if result else "F"
+OP_NOT = "!"
 
 
 def tokenize_expr(expr):
@@ -135,19 +99,6 @@ def convert_to_rpn(tokens):
     return output
 
 
-def evaluate_rules(kb: KnowledgeBaseDAG, initial_facts: str, queries: str) -> str:
-    # Update facts with the initial facts
-    for fact in initial_facts:
-        kb.update_fact(fact)
-
-    results = []
-    for query in queries:
-        result = evaluate_condition(kb, initial_facts, query)
-        results.append(result)
-
-    return "".join(results)
-
-
 if __name__ == "__main__":
     input_filename = sys.argv[1]
     with open(input_filename, "r") as f:
@@ -155,5 +106,3 @@ if __name__ == "__main__":
 
     rules, initial_facts, queries = parse_input(input_lines)
     print("Current Knowledge Base:", rules)
-    results = evaluate_rules(rules, initial_facts, queries)
-    print("Results:", results)
