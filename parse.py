@@ -75,28 +75,45 @@ def tokenize_expr(expr):
     return tokens
 
 
-def convert_to_rpn(tokens):
-    output = []
-    stack = []
+def convert_to_rpn(regex):
+    """Converts a regular expression to Reverse Polish Notation (RPN)"""
+    precedence = {'!': 3, '&': 2, '|': 1, '^': 1}
+    rpn_tokens = []
+    operator_stack = []
 
-    for token in tokens:
-        if token in (OP_AND, OP_OR, OP_XOR):
-            while stack and stack[-1] != '(':
-                output.append(stack.pop())
-            stack.append(token)
+    idx = 0
+    while idx < len(regex):
+        token = regex[idx]
+        if token.isupper():
+            # Operand (single character)
+            rpn_tokens.append(token)
         elif token == '(':
-            stack.append(token)
+            operator_stack.append(token)
         elif token == ')':
-            while stack and stack[-1] != '(':
-                output.append(stack.pop())
-            stack.pop()
+            while operator_stack and operator_stack[-1] != '(':
+                rpn_tokens.append(operator_stack.pop())
+            operator_stack.pop()  # Discard the left parenthesis
         else:
-            output.append(token)
+            while (operator_stack and
+                   operator_stack[-1] != '(' and
+                   precedence.get(operator_stack[-1], 0) >= precedence.get(token, 0)):
+                rpn_tokens.append(operator_stack.pop())
+            operator_stack.append(token)
 
-    while stack:
-        output.append(stack.pop())
+        idx += 1
 
-    return output
+        if idx < len(regex) and regex[idx] == '!':
+            operator_stack.append(regex[idx])
+            idx += 1
+
+    while operator_stack:
+        # Pop any remaining operators from the stack to the output
+        rpn_tokens.append(operator_stack.pop())
+
+    return ''.join(rpn_tokens)
+
+
+print(convert_to_rpn("!(F | G) + H"))  # 결과: 'FG|!H+'
 
 
 if __name__ == "__main__":
@@ -105,4 +122,5 @@ if __name__ == "__main__":
         input_lines = f.readlines()
 
     rules, initial_facts, queries = parse_input(input_lines)
-    print("Current Knowledge Base:", rules)
+    print("Current Knowledge Base:\n")
+    print(rules)
