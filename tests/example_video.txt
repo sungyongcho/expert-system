@@ -1,0 +1,12 @@
+# example from this video
+# https://www.youtube.com/watch?v=6DU42so8k48
+
+
+F + B => Z
+C + D => F
+A => D
+
+=AEBC
+
+?Z
+# should give True

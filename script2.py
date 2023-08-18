@@ -13,7 +13,8 @@ class KnowledgeBaseDAG:
 
     def add_rule(self, rule: str, result: str):
         rule_tokens = tokenize_expr(rule)
-        self.graph[result].add(tuple(rule_tokens))
+        rpn_tokens = convert_to_rpn(rule_tokens)
+        self.graph[result].add(tuple(rpn_tokens))
 
     def update_fact(self, fact: str, negated: bool = False):
         self.negated[fact] = negated
@@ -67,53 +68,40 @@ OP_XOR = "^"
 
 
 def eval_expr(kb: KnowledgeBaseDAG, facts, tokens):
-    if not tokens:
-        return False
-
-    token = tokens.pop(0).strip()
-    print("token:", token)
-
-    if token == "!":
-        return not eval_expr(kb, facts, tokens)
-    elif token == "(":
-        result = eval_expr(kb, facts, tokens)
-        while tokens[0] != ")":
-            t = tokens.pop(0).strip()
-            if t == OP_AND:
-                result = result and eval_expr(kb, facts, tokens)
-            elif t == OP_OR:
-                result = result or eval_expr(kb, facts, tokens)
-            elif t == OP_XOR:
-                result = result != eval_expr(kb, facts, tokens)
-        del tokens[0]
-        return result
-    else:
-        token_value = token in facts
-        print("what is token_value:", token_value)
-        if kb.is_fact_negated(token):
-            return not token_value
+    stack = []
+    for token in tokens:
+        if token == '+':
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a and b)
         else:
-            if token_value:
-                return True
-            rules = kb.get_rules_for_fact(token)
-            print("rules:", rules)
-            for rule in rules:
-                rule_result = all(eval_expr(kb, facts, list(token_rule))
-                                  for token_rule in rule)
-                if rule_result:
-                    return True
-            return False
+            stack.append(kb.is_fact_negated(token) or (token in facts))
+
+    return stack[0]
+
+
+def apply_rules(kb: KnowledgeBaseDAG, facts: str):
+    new_facts = set(facts)
+    changes = True
+
+    while changes:
+        changes = False
+        for rule, products in kb.graph.items():
+            if all(fact in new_facts for fact in rule):
+                for product in products:
+                    if product not in new_facts:
+                        new_facts.add(product)
+                        changes = True
+
+    return new_facts
 
 
 def evaluate_condition(kb: KnowledgeBaseDAG, facts: str, condition: str) -> str:
+    facts = apply_rules(kb, facts)
     tokens = tokenize_expr(condition)
-    try:
-        result = eval_expr(kb, facts, tokens)
-        if not tokens:
-            return "T" if result else "F"
-        return "U"  # Undetermined - remaining tokens
-    except:
-        return "E"  # Error in evaluation
+    rpn_tokens = convert_to_rpn(tokens)
+    result = eval_expr(kb, facts, rpn_tokens)
+    return "T" if result else "F"
 
 
 def tokenize_expr(expr):
@@ -121,6 +109,30 @@ def tokenize_expr(expr):
     expr = expr.replace("^", " ^ ").replace("(", " ( ").replace(")", " ) ")
     tokens = re.split(r'\s+', expr.strip())
     return tokens
+
+
+def convert_to_rpn(tokens):
+    output = []
+    stack = []
+
+    for token in tokens:
+        if token in (OP_AND, OP_OR, OP_XOR):
+            while stack and stack[-1] != '(':
+                output.append(stack.pop())
+            stack.append(token)
+        elif token == '(':
+            stack.append(token)
+        elif token == ')':
+            while stack and stack[-1] != '(':
+                output.append(stack.pop())
+            stack.pop()
+        else:
+            output.append(token)
+
+    while stack:
+        output.append(stack.pop())
+
+    return output
 
 
 def evaluate_rules(kb: KnowledgeBaseDAG, initial_facts: str, queries: str) -> str:
@@ -142,9 +154,6 @@ if __name__ == "__main__":
         input_lines = f.readlines()
 
     rules, initial_facts, queries = parse_input(input_lines)
-    print("Current Knowledge Base:")
-    print(rules)
-    # print(rules, initial_facts, queries)
-    # print(queries)
-    # results = evaluate_rules(rules, initial_facts, queries)
-    # print("Results:", results)
+    print("Current Knowledge Base:", rules)
+    results = evaluate_rules(rules, initial_facts, queries)
+    print("Results:", results)
