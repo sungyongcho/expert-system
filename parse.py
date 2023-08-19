@@ -8,6 +8,7 @@ from collections import defaultdict
 class KnowledgeBaseDAG:
     def __init__(self):
         self.graph = {}
+        self.facts = []
         self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
@@ -64,6 +65,30 @@ def parse_input(input_lines: List[str]) -> Tuple[KnowledgeBaseDAG, str, str]:
                 kb.add_rule(key.strip(), value.strip())
 
     return kb, initial_facts, queries
+
+
+def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
+
+    line = line.split("#")[0].strip()
+    if not line:
+        return
+
+    if line.startswith("="):
+        facts = line[1:].strip()
+        kb.facts = None
+        kb.facts = facts
+    elif line.startswith("?"):
+        queries = line[1:].strip()
+        return queries
+    elif "<=>" in line:
+        left, right = line.split("<=>")
+        kb.add_rule(left.strip(), right.strip())
+        kb.add_rule(right.strip(), left.strip())
+    else:
+        key, value = line.split("=>")
+        kb.add_rule(key.strip(), value.strip())
+
+    return None
 
 
 OP_AND = "+"
