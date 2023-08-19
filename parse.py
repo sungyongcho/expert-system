@@ -11,13 +11,15 @@ class KnowledgeBaseDAG:
         self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
-        rule_tokens = tokenize_expr(rule)
-        result_tokens = tokenize_expr(result)
-        rpn_expression = convert_to_rpn(rule_tokens)
-        rpn_result = convert_to_rpn(result_tokens)
+        tokens_value = tokenize_expr(rule)
+        tokens_key = tokenize_expr(result)
+        rpn_value = convert_to_rpn(tokens_value)
+        rpn_key = convert_to_rpn(tokens_key)
         # 키가 딕셔너리에 없으면 빈 set을 할당한 후 추가
-        if tuple(result_tokens) not in self.graph:
-            self.graph[tuple(rpn_result)] = tuple(rpn_expression)
+        if tuple(rpn_key) in self.graph:
+            self.graph[tuple(rpn_key)].append(tuple(rpn_value))
+        else:
+            self.graph[tuple(rpn_key)] = [tuple(rpn_value)]
 
     def update_fact(self, fact: str, negated: bool = False):
         self.negated[fact] = negated
@@ -31,7 +33,7 @@ class KnowledgeBaseDAG:
     def __str__(self):
         output = ""
         for key in self.graph:
-            output += f"{key} => {self.graph[key]}\n"
+            output += f"{key}: {self.graph[key]}\n"
         return output
 
 
