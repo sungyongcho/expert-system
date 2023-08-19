@@ -108,8 +108,9 @@ def eval_expr(rules, facts, query):
 
     if key_tuple:
         elements = rules.graph[key_tuple]
-        print(elements)
-        return process_elements(elements, rules, facts)
+        for element in elements:
+            if process_elements(element, rules, facts):
+                return True
 
     return False
 
