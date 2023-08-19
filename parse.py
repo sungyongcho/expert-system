@@ -82,31 +82,40 @@ def convert_to_rpn(regex):
     precedence = {'!': 3, '&': 2, '|': 1, '^': 1}
     rpn_tokens = []
     operator_stack = []
+    negation_counter = 0
 
     idx = 0
     while idx < len(regex):
         token = regex[idx]
-        if token.isupper():
-            # Operand (single character)
-            rpn_tokens.append(token)
-        elif token == '(':
+
+        if token == '!':
+            negation_counter += 1
+            idx += 1
+            continue
+
+        if token == '(':
             operator_stack.append(token)
         elif token == ')':
             while operator_stack and operator_stack[-1] != '(':
                 rpn_tokens.append(operator_stack.pop())
             operator_stack.pop()  # Discard the left parenthesis
         else:
-            while (operator_stack and
-                   operator_stack[-1] != '(' and
-                   precedence.get(operator_stack[-1], 0) >= precedence.get(token, 0)):
-                rpn_tokens.append(operator_stack.pop())
-            operator_stack.append(token)
+            if token.isupper():
+                # Operand (single character)
+                rpn_tokens.append(token)
+                if negation_counter % 2 != 0:
+                    rpn_tokens.append('!')
+                    negation_counter = 0
+            else:
+                while (operator_stack and
+                        operator_stack[-1] != '(' and
+                        precedence.get(operator_stack[-1], 0) >= precedence.get(token, 0)):
+                    rpn_tokens.append(operator_stack.pop())
+                operator_stack.append(token)
+
+            negation_counter = 0
 
         idx += 1
-
-        if idx < len(regex) and regex[idx] == '!':
-            operator_stack.append(regex[idx])
-            idx += 1
 
     while operator_stack:
         # Pop any remaining operators from the stack to the output
