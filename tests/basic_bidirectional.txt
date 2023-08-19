@@ -2,10 +2,10 @@
 
 A <=> B
 
-#=B
-#?A
-## Result should be
-## A:True
+=B
+?A
+# Result should be
+# A:True
 
 =A
 ?B

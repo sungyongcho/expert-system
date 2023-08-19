@@ -107,8 +107,6 @@ def eval_expr(rules, facts, query, visited=None):
     if query in visited:
         return False
 
-    visited.add(query)
-
     # if query in rules:
     #     elements = rules[query]
     #     return process_elements(elements, rules, facts)
@@ -118,8 +116,11 @@ def eval_expr(rules, facts, query, visited=None):
     if key_tuple:
         elements = rules.graph[key_tuple]
         for element in elements:
-            if process_elements(element, rules, facts, visited):
+            # print(element)
+            if process_elements(element, rules, facts, visited) == True:
                 return True
+
+    visited.add(query)
 
     return False
 

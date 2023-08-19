@@ -1,12 +1,12 @@
 # Hard Not
 
-#A => B
-#!!!!!A => B
+A => B
+!!!!!A => B
 
-#=
-#?B
-## Result should be
-## B:True
+=
+?B
+# Result should be
+# B:True
 
 C => !D
 
