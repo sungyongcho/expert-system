@@ -48,18 +48,18 @@
 # facts = {'D', 'E'}
 
 
-rule = {'A': ['B', 'C', '+'],
-        'B': ['D', 'E', '^'],
-        'C': ['B']
-        }
+# rule = {'A': ['B', 'C', '+'],
+#         'B': ['D', 'E', '^'],
+#         'C': ['B']
+#         }
 
 # facts = {}
 # facts = {'D'}
 # facts = {'E'}
-facts = {'D', 'E'}
+# facts = {'D', 'E'}
 
 
-def process_elements(elements, rules, facts):
+def process_elements(elements, rules, facts, visited):
     stack = []
     for index, element in enumerate(elements):
         if element == '!':
@@ -67,7 +67,8 @@ def process_elements(elements, rules, facts):
             stack.pop()
             # and then run eval_expr again
             next_element = elements[index - 1]
-            negation_result = not eval_expr(rules, facts, next_element)
+            negation_result = not eval_expr(
+                rules, facts, next_element, visited)
             stack.append(negation_result)
         elif element == '+':
             right = stack.pop()
@@ -85,7 +86,7 @@ def process_elements(elements, rules, facts):
             result = left ^ right
             stack.append(result)
         else:
-            stack.append(eval_expr(rules, facts, element))
+            stack.append(eval_expr(rules, facts, element, visited))
     return stack.pop()
 
 
@@ -96,9 +97,17 @@ def find_query_in_keys(rules, query):
     return None
 
 
-def eval_expr(rules, facts, query):
+def eval_expr(rules, facts, query, visited=None):
+    if visited is None:
+        visited = set()
+
     if query in facts:
         return True
+
+    if query in visited:
+        return False
+
+    visited.add(query)
 
     # if query in rules:
     #     elements = rules[query]
@@ -109,7 +118,7 @@ def eval_expr(rules, facts, query):
     if key_tuple:
         elements = rules.graph[key_tuple]
         for element in elements:
-            if process_elements(element, rules, facts):
+            if process_elements(element, rules, facts, visited):
                 return True
 
     return False
