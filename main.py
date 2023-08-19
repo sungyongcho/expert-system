@@ -13,8 +13,8 @@ if __name__ == "__main__":
         for input_line in f:
             queries = parse_oneline(kb, input_line)
             if queries is not None:
-                print("Current Knowledge Base:\n")
-                print(kb)
+                # print("Current Knowledge Base:\n")
+                # print(kb)
                 print(eval_query(kb, kb.facts, queries))
         # input_lines = f.readlines()
 

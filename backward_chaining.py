@@ -104,23 +104,24 @@ def eval_expr(rules, facts, query, visited=None):
     if query in facts:
         return True
 
-    if query in visited:
-        return False
-
     # if query in rules:
     #     elements = rules[query]
     #     return process_elements(elements, rules, facts)
 
     key_tuple = find_query_in_keys(rules, query)
 
+    if key_tuple in visited:
+        return False
+
     if key_tuple:
         elements = rules.graph[key_tuple]
         for element in elements:
-            # print(element)
-            if process_elements(element, rules, facts, visited) == True:
-                return True
+            visited_copy = visited.copy()
+            visited_copy.add(key_tuple)
 
-    visited.add(query)
+            if process_elements(element, rules, facts, visited_copy) == True:
+                return True
+    visited.add(key_tuple)
 
     return False
 
