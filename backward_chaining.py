@@ -73,7 +73,8 @@ def process_elements(kb: KnowledgeBaseDAG, elements, visited):
                 if kb.interactive:
                     print("(expert-system) ", end='')
                 print(f"Applying negation (!) to '{element_operand}'")
-            negation_result = not eval_expr(kb, operand, visited)
+            negation_result = not eval_expr(kb, element_operand, visited)
+            print("negation_result:", negation_result)
             stack.append(negation_result)
             stack_elements.append(element_operand)
         elif element in ('+', '|', '^'):
