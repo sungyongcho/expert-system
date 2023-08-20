@@ -6,6 +6,25 @@ from backward_chaining import eval_query
 from parse import KnowledgeBaseDAG, parse_input, parse_oneline
 
 
+class TextColors:
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    RESET = '\033[0m'
+
+
+def print_colored_text(text, color_code):
+    if color_code.upper() in dir(TextColors):
+        color = getattr(TextColors, color_code.upper())
+        print(f"{color}{text}{TextColors.RESET}")
+    else:
+        print(text)
+
+
 def interactive_mode(kb: KnowledgeBaseDAG):
     try:
         while True:
