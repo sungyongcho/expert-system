@@ -11,7 +11,7 @@ class KnowledgeBaseDAG:
         self.facts = []
         self.reasoning = False
         self.interactive = False
-        self.negated = defaultdict(bool)
+        # self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
         tokens_value = tokenize_expr(rule)
@@ -36,11 +36,11 @@ class KnowledgeBaseDAG:
             if fact.isalpha() and fact not in self.facts:
                 self.facts.append(fact)
 
-    def get_rules_for_fact(self, fact: str):
-        return self.rules.get(fact, set())
+    # def get_rules_for_fact(self, fact: str):
+    #     return self.rules.get(fact, set())
 
-    def is_fact_negated(self, fact: str):
-        return self.negated.get(fact, False)
+    # def is_fact_negated(self, fact: str):
+    #     return self.negated.get(fact, False)
 
     def __str__(self):
         output = ""
