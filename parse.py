@@ -9,6 +9,7 @@ class KnowledgeBaseDAG:
     def __init__(self):
         self.graph = {}
         self.facts = []
+        self.reasoning = False
         self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
