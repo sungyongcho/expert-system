@@ -94,8 +94,10 @@ def main():
 
     if args.input_filename:
         if args.interactive:
+            print("(expert-system) ", end='')
             print(
                 "Interactive mode enabled--will parse the input file and move to interactive mode\n")
+            kb.interactive = True
         with open(args.input_filename, "r") as f:
             for input_line in f:
                 queries = parse_oneline(kb, input_line)
@@ -106,6 +108,7 @@ def main():
 
     elif args.interactive:
         print("Interactive mode enabled.\n")
+        kb.interactive = True
         interactive_mode(kb)
 
 

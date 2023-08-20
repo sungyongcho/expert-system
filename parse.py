@@ -10,6 +10,7 @@ class KnowledgeBaseDAG:
         self.rules = {}
         self.facts = []
         self.reasoning = False
+        self.interactive = False
         self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
