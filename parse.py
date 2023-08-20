@@ -23,8 +23,17 @@ class KnowledgeBaseDAG:
         else:
             self.rules[tuple(rpn_key)] = [tuple(rpn_value)]
 
-    def update_fact(self, fact: str, negated: bool = False):
-        self.negated[fact] = negated
+    # def update_fact(self, fact: str, negated: bool = False):
+    #     self.negated[fact] = negated
+
+    def set_facts(self, facts: str):
+        self.facts.clear()
+        self.facts = list(facts)
+
+    def add_facts(self, facts: str):
+        for fact in facts.replace(" ", ""):
+            if fact.isalpha() and fact not in self.facts:
+                self.facts.append(fact)
 
     def get_rules_for_fact(self, fact: str):
         return self.rules.get(fact, set())
@@ -76,8 +85,7 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
 
     if line.startswith("="):
         facts = line[1:].strip()
-        kb.facts = None
-        kb.facts = facts
+        kb.set_facts(facts)
     elif line.startswith("?"):
         queries = line[1:].strip()
         return queries

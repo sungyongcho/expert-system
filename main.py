@@ -6,16 +6,22 @@ from backward_chaining import eval_query
 from parse import KnowledgeBaseDAG, parse_input, parse_oneline
 
 
-def interactive_mode(kb):
+def interactive_mode(kb: KnowledgeBaseDAG):
     try:
         while True:
             command = input("(expert-system) ").strip()
             if command == "help":
-                print("Available commands:")
-                print("help - Display this help message")
-                print("rules - Display the rules in the knowledge base")
-                print("facts - Display the facts in the knowledge base")
-                print("exit - Exit the interactive mode")
+                print("\nAvailable commands:\n")
+                print("  help - Display this help message")
+                print("  rules - Display the rules in the knowledge base")
+                print("  facts - Display the facts in the knowledge base")
+                print("  = - Set the facts in the knowledge base")
+                print("  =+ - Add a fact to the knowledge base")
+                print("  ? - Evaluate a query using the knowledge base")
+                print("  reasoning - Check reasoning mode status")
+                print("  reasoning on - Turn on reasoning mode")
+                print("  reasoning off - Turn off reasoning mode")
+                print("  exit - Exit the interactive mode\n")
             elif command == "rules":
                 print("Rules in the knowledge base:")
                 print(kb)
@@ -32,6 +38,30 @@ def interactive_mode(kb):
             elif command == "reasoning off":
                 kb.reasoning = False
                 print("Reasoning mode is now off")
+            elif command.startswith('='):
+                fact = command[1:]
+                if not fact:
+                    print("Invalid command. The fact should follow after '='.")
+                elif command.startswith('=+'):
+                    fact = command[2:]
+                    kb.add_facts(fact)
+                    print(f"Fact '{fact}' added to the knowledge base.")
+                else:
+                    confirm = input("The knowledge base is not empty.\n"
+                                    f"The current facts stored is {kb.facts}\n"
+                                    "Do you want to continue? (y/n) ").strip().lower()
+                    if confirm != 'y':
+                        print("Operation cancelled.")
+                        continue
+                    kb.set_facts(fact)
+                    print(f"Facts in the knowledge base set to '{fact}'.")
+            elif command.startswith('?'):
+                query = command[1:]
+                if not query:
+                    print("Invalid command. The query should follow after '?'.")
+                else:
+                    result = kb.eval_query(query)
+                    print(f"The result of the query '{query}' is {result}.")
             elif command == "exit":
                 break
             else:
@@ -65,7 +95,7 @@ def main():
     if args.input_filename:
         if args.interactive:
             print(
-                "Interactive mode enabled--will parse the rules first and move to interactive mode\n")
+                "Interactive mode enabled--will parse the input file and move to interactive mode\n")
         with open(args.input_filename, "r") as f:
             for input_line in f:
                 queries = parse_oneline(kb, input_line)
