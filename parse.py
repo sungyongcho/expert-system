@@ -7,7 +7,7 @@ from collections import defaultdict
 
 class KnowledgeBaseDAG:
     def __init__(self):
-        self.graph = {}
+        self.rules = {}
         self.facts = []
         self.reasoning = False
         self.negated = defaultdict(bool)
@@ -18,24 +18,24 @@ class KnowledgeBaseDAG:
         rpn_value = convert_to_rpn(tokens_value)
         rpn_key = convert_to_rpn(tokens_key)
         # 키가 딕셔너리에 없으면 빈 set을 할당한 후 추가
-        if tuple(rpn_key) in self.graph:
-            self.graph[tuple(rpn_key)].append(tuple(rpn_value))
+        if tuple(rpn_key) in self.rules:
+            self.rules[tuple(rpn_key)].append(tuple(rpn_value))
         else:
-            self.graph[tuple(rpn_key)] = [tuple(rpn_value)]
+            self.rules[tuple(rpn_key)] = [tuple(rpn_value)]
 
     def update_fact(self, fact: str, negated: bool = False):
         self.negated[fact] = negated
 
     def get_rules_for_fact(self, fact: str):
-        return self.graph.get(fact, set())
+        return self.rules.get(fact, set())
 
     def is_fact_negated(self, fact: str):
         return self.negated.get(fact, False)
 
     def __str__(self):
         output = ""
-        for key in self.graph:
-            output += f"{key}: {self.graph[key]}\n"
+        for key in self.rules:
+            output += f"{key}: {self.rules[key]}\n"
         return output
 
 

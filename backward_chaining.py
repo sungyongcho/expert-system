@@ -59,7 +59,10 @@
 # facts = {'D', 'E'}
 
 
-def process_elements(elements, rules, facts, visited):
+from parse import KnowledgeBaseDAG
+
+
+def process_elements(kb: KnowledgeBaseDAG, elements, visited):
     stack = []
     for index, element in enumerate(elements):
         if element == '!':
@@ -68,7 +71,7 @@ def process_elements(elements, rules, facts, visited):
             # and then run eval_expr again
             next_element = elements[index - 1]
             negation_result = not eval_expr(
-                rules, facts, next_element, visited)
+                kb, next_element, visited)
             stack.append(negation_result)
         elif element == '+':
             right = stack.pop()
@@ -86,40 +89,40 @@ def process_elements(elements, rules, facts, visited):
             result = left ^ right
             stack.append(result)
         else:
-            stack.append(eval_expr(rules, facts, element, visited))
+            stack.append(eval_expr(kb, element, visited))
     return stack.pop()
 
 
 def find_query_in_keys(rules, query):
-    for key_tuple, _ in rules.graph.items():
+    for key_tuple, _ in rules.items():
         if query in key_tuple:
             return key_tuple
     return None
 
 
-def eval_expr(rules, facts, query, visited=None):
+def eval_expr(kb: KnowledgeBaseDAG, query, visited=None):
     if visited is None:
         visited = set()
 
-    if query in facts:
+    if query in kb.facts:
         return True
 
     # if query in rules:
     #     elements = rules[query]
     #     return process_elements(elements, rules, facts)
 
-    key_tuple = find_query_in_keys(rules, query)
+    key_tuple = find_query_in_keys(kb.rules, query)
 
     if key_tuple in visited:
         return False
 
     if key_tuple:
-        elements = rules.graph[key_tuple]
+        elements = kb.rules[key_tuple]
         for element in elements:
             visited_copy = visited.copy()
             visited_copy.add(key_tuple)
 
-            if process_elements(element, rules, facts, visited_copy) == True:
+            if process_elements(kb, element, visited_copy) == True:
                 return True
     visited.add(key_tuple)
 
@@ -130,10 +133,10 @@ def eval_expr(rules, facts, query, visited=None):
 #     return [char for char in query if char.isalnum()]
 
 
-def eval_query(rules, facts, queries):
+def eval_query(kb: KnowledgeBaseDAG, queries):
     results = {}
     for query in queries:
-        results[query] = eval_expr(rules, facts, query)
+        results[query] = eval_expr(kb, query)
     return results
 
 
