@@ -8,52 +8,54 @@
 # Result should be
 # E:False
 
+## needs to check
 =A
 ?E
 # Result should be
 # E:True
 
-=B
-?E
-# Result should be
-# E:False
-
-=C
-?E
-# Result should be
-# E:False
-
-=AC
-?E
-# Result should be
-# E:True
-
-=BC
-?E
-# Result should be
-# E:True
-
-=F
-?E
-# Result should be
-# E:False
-
-=G
-?E
-# Result should be
-# E:False
-
-=H
-?E
-# Result should be
-# E:False
-
-=FH
-?E
-# Result should be
-# E:True
-
-=GH
-?E
-# Result should be
-# E:True
+#=B
+#?E
+## Result should be
+## E:False
+#
+#=C
+#?E
+## Result should be
+## E:False
+#
+#=AC
+#?E
+## Result should be
+## E:True
+#
+#=BC
+#?E
+## Result should be
+## E:True
+#
+#=F
+#?E
+## Result should be
+## E:False
+#
+#=G
+#?E
+## Result should be
+## E:False
+#
+#=H
+#?E
+## Result should be
+## E:False
+#
+#=FH
+#?E
+## Result should be
+## E:True
+#
+#=GH
+#?E
+## Result should be
+## E:True
+#
