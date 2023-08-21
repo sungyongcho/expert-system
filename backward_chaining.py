@@ -107,7 +107,10 @@ def process_elements(kb: KnowledgeBaseDAG, elements, visited):
 
 def find_query_in_keys(rules, query):
     for key_tuple, _ in rules.items():
+        print(key_tuple)
         if query in key_tuple:
+            if key_tuple + ('!',) in rules.keys():
+                return "ERROR"
             return key_tuple
     return None
 
@@ -131,6 +134,13 @@ def eval_expr(kb: KnowledgeBaseDAG, query, visited=None):
             print("(expert-system) ", end='')
         print(f"Finding {query} in rules...")
     key_tuple = find_query_in_keys(kb.rules, query)
+
+    if key_tuple == 'ERROR':
+        if kb.reasoning:
+            if kb.interactive:
+                print("(expert-system) ", end='')
+            print(f"Contradiction found in the rule {query}.")
+        return 'ERROR'
 
     if key_tuple in visited:
         return False
@@ -163,6 +173,7 @@ def eval_query(kb: KnowledgeBaseDAG, queries):
         if kb.interactive:
             print("(expert-system) ", end='')
         print(f"Evaluating queries {list(queries)}")
+
     results = {}
     for query in queries:
         if kb.reasoning:

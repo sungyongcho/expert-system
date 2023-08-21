@@ -121,6 +121,7 @@ def main():
             for input_line in f:
                 queries = parse_oneline(kb, input_line)
                 if queries is not None:
+                    print(kb)
                     print(eval_query(kb, queries))
         if args.interactive:
             interactive_mode(kb)
