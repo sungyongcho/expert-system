@@ -1,3 +1,4 @@
+import os
 import sys
 import argparse
 import readline
@@ -117,6 +118,9 @@ def main():
             print(
                 "Interactive mode enabled--will parse the input file and move to interactive mode\n")
             kb.interactive = True
+        if not os.path.exists(args.input_filename):
+            print(f"Error: File '{args.input_filename}' does not exist.")
+            exit()
         with open(args.input_filename, "r") as f:
             for input_line in f:
                 queries = parse_oneline(kb, input_line)
