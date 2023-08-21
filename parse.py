@@ -14,10 +14,10 @@ class KnowledgeBaseDAG:
         # self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
-        tokens_value = tokenize_expr(rule)
-        tokens_key = tokenize_expr(result)
-        rpn_value = convert_to_rpn(tokens_value)
-        rpn_key = convert_to_rpn(tokens_key)
+        # tokens_value = tokenize_expr(rule)
+        # tokens_key = tokenize_expr(result)
+        rpn_value = convert_to_rpn(rule)
+        rpn_key = convert_to_rpn(result)
         # 키가 딕셔너리에 없으면 빈 set을 할당한 후 추가
         if tuple(rpn_key) in self.rules:
             self.rules[tuple(rpn_key)].append(tuple(rpn_value))
@@ -94,35 +94,22 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
             return -100
     elif line.startswith("?") and all(character.isupper() for character in line[1:]):
         queries = line[1:].strip()
-        print(queries)
         return queries
     elif "<=>" in line:
-        if line.count("<=>") > 1:
-            return -1
-        left, right = line.split("<=>")
-        if not left or not right:
-            return -2
-        elif not is_valid_string(left, ALLOWED_CHARS) or \
-                not is_valid_string(right, ALLOWED_CHARS):
-            return -3
-        kb.add_rule(left.strip(), right.strip())
-        kb.add_rule(right.strip(), left.strip())
+        result = check_valid_rule(line, "<=>")
+        if isinstance(result, tuple) and len(result) == 2:
+            left, right = result
+            kb.add_rule(left, right)
+            kb.add_rule(right, left)
+        else:
+            return result
     elif "=>" in line:
-        if line.count("=>") > 1:
-            return -4
-        key, value = line.split("=>")
-        if not key or not value:
-            return -5
-        elif not is_valid_string(key.strip(), ALLOWED_CHARS) or \
-                not is_valid_string(value.strip(), ALLOWED_CHARS):
-            print(key.strip(), value.strip())
-            return -6
-        elif not (is_parentheses_balanced(tokenize_expr(key.strip())) and is_parentheses_balanced(tokenize_expr(value.strip()))):
-            return -7
-        elif not is_valid_expression(tokenize_expr(key.strip())) or  \
-                not is_valid_expression(tokenize_expr(value.strip())):
-            return -8
-        kb.add_rule(key.strip(), value.strip())
+        result = check_valid_rule(line, "=>")
+        if isinstance(result, tuple) and len(result) == 2:
+            key, value = result
+            kb.add_rule(key, value)
+        else:
+            return result
     else:
         return -9999
 
@@ -189,7 +176,24 @@ def convert_to_rpn(regex):
     return ''.join(rpn_tokens)
 
 
-ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ+|^!() "
+def check_valid_rule(line, delim):
+    if line.count(delim) > 1:
+        return -1
+    left, right = line.split(delim)
+    if not left or not right:
+        return -2
+    left = tokenize_expr(left.strip())
+    right = tokenize_expr(right.strip())
+    if not (is_valid_string(left, ALLOWED_CHARS) and is_valid_string(right, ALLOWED_CHARS)):
+        return -3
+    if not (is_parentheses_balanced(left) and is_parentheses_balanced(right)):
+        return -4
+    if not (is_valid_expression(left) and is_valid_expression(right)):
+        return -5
+    return left, right
+
+
+ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ+|^!()"
 
 
 def is_valid_string(s, allowed_chars):
