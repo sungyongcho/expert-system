@@ -85,18 +85,46 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
         return
 
     if line.startswith("="):
-        facts = line[1:].strip()
-        kb.set_facts(facts)
-    elif line.startswith("?"):
+        if len(line) > 1 and all(character.isupper() for character in line[1:]):
+            facts = line[1:].strip()
+            kb.set_facts(facts)
+        elif len(line) == 1:
+            return None
+        else:
+            return -100
+    elif line.startswith("?") and all(character.isupper() for character in line[1:]):
         queries = line[1:].strip()
+        print(queries)
         return queries
     elif "<=>" in line:
+        if line.count("<=>") > 1:
+            return -1
         left, right = line.split("<=>")
+        if not left or not right:
+            return -2
+        elif not is_valid_string(left, ALLOWED_CHARS) or \
+                not is_valid_string(right, ALLOWED_CHARS):
+            return -3
         kb.add_rule(left.strip(), right.strip())
         kb.add_rule(right.strip(), left.strip())
-    else:
+    elif "=>" in line:
+        if line.count("=>") > 1:
+            return -4
         key, value = line.split("=>")
+        if not key or not value:
+            return -5
+        elif not is_valid_string(key.strip(), ALLOWED_CHARS) or \
+                not is_valid_string(value.strip(), ALLOWED_CHARS):
+            print(key.strip(), value.strip())
+            return -6
+        elif not (is_parentheses_balanced(tokenize_expr(key.strip())) and is_parentheses_balanced(tokenize_expr(value.strip()))):
+            return -7
+        elif not is_valid_expression(tokenize_expr(key.strip())) or  \
+                not is_valid_expression(tokenize_expr(value.strip())):
+            return -8
         kb.add_rule(key.strip(), value.strip())
+    else:
+        return -9999
 
     return None
 
@@ -159,3 +187,52 @@ def convert_to_rpn(regex):
         rpn_tokens.append(operator_stack.pop())
 
     return ''.join(rpn_tokens)
+
+
+ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ+|^!() "
+
+
+def is_valid_string(s, allowed_chars):
+    return all(c in allowed_chars for c in s)
+
+
+def is_parentheses_balanced(expression):
+    stack = []
+    opening_parentheses = "("
+    closing_parentheses = ")"
+    matching_parentheses = {")": "("}
+    # Check if paerenthesis character exists
+    if not (opening_parentheses in expression or closing_parentheses in expression):
+        return True
+
+    for char in expression:
+        if char in opening_parentheses:
+            stack.append(char)
+        elif char in closing_parentheses:
+            if not stack or stack.pop() != matching_parentheses[char]:
+                return False
+
+    return len(stack) == 0
+
+
+def is_valid_expression(tokens):
+    binary_operators = ['+', '|', '^']
+    valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+    operand_count = 0
+    operator_count = 0
+
+    for token in tokens:
+        if token == '!':
+            continue  # Skip '!' (not operator)
+        elif token in ['(', ')']:
+            continue  # Skip parentheses
+        elif token in binary_operators:
+            operator_count += 1
+        elif token in valid_operands:
+            operand_count += 1
+        else:
+            return False  # Invalid token found
+
+    # Check if the number of operators is one less than the number of operands
+    return operand_count == operator_count + 1

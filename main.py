@@ -120,7 +120,11 @@ def main():
         with open(args.input_filename, "r") as f:
             for input_line in f:
                 queries = parse_oneline(kb, input_line)
-                if queries is not None:
+                if queries != None and not isinstance(queries, str) and queries < 0:
+                    print("Error in syntax:",
+                          f"[{input_line.strip()}]", f"{queries}")
+                    exit()
+                elif queries is not None:
                     print(kb)
                     print(eval_query(kb, queries))
         if args.interactive:
