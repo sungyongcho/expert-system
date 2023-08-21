@@ -107,7 +107,6 @@ def process_elements(kb: KnowledgeBaseDAG, elements, visited):
 
 def find_query_in_keys(rules, query):
     for key_tuple, _ in rules.items():
-        print(key_tuple)
         if query in key_tuple:
             if key_tuple + ('!',) in rules.keys():
                 return "ERROR"

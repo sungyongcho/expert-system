@@ -125,7 +125,7 @@ def main():
                           f"[{input_line.strip()}]", f"{queries}")
                     exit()
                 elif queries is not None:
-                    print(kb)
+                    # print(kb)
                     print(eval_query(kb, queries))
         if args.interactive:
             interactive_mode(kb)
