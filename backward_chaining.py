@@ -72,7 +72,8 @@ def process_elements(kb: KnowledgeBaseDAG, elements, visited):
             if kb.reasoning:
                 if kb.interactive:
                     print("(expert-system) ", end='')
-                print(f"Applying negation (!) to '{element_operand}'")
+                print(
+                    f"Applying negation (!) to '{element_operand} ({operand})'")
             negation_result = not eval_expr(kb, element_operand, visited)
             print("negation_result:", negation_result)
             stack.append(negation_result)
@@ -145,6 +146,8 @@ def eval_expr(kb: KnowledgeBaseDAG, query, visited=None):
             visited_copy.add(key_tuple)
 
             if process_elements(kb, element, visited_copy) == True:
+                if (len(key_tuple) == 2 and key_tuple[1] == '!'):
+                    return False
                 return True
     visited.add(key_tuple)
 
