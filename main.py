@@ -3,7 +3,7 @@ import sys
 import argparse
 import readline
 
-from backward_chaining import eval_query
+from backward_chaining import eval_query, eval_rules_with_facts
 from parse import KnowledgeBaseDAG, parse_input, parse_oneline
 
 
@@ -80,6 +80,8 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                 if not query:
                     print("Invalid command. The query should follow after '?'.")
                 else:
+                    ##########################
+                    eval_rules_with_facts(kb)
                     result = kb.eval_query(query)
                     print(f"The result of the query '{query}' is {result}.")
             elif command == "exit":
@@ -130,6 +132,8 @@ def main():
                     exit()
                 elif queries is not None:
                     # print(kb)
+                    ##########################
+                    eval_rules_with_facts(kb)
                     print(eval_query(kb, queries))
         if args.interactive:
             interactive_mode(kb)

@@ -8,6 +8,7 @@ from collections import defaultdict
 class KnowledgeBaseDAG:
     def __init__(self):
         self.rules = {}
+        self.rev_rules = {}
         self.facts = []
         self.reasoning = False
         self.interactive = False
@@ -24,6 +25,11 @@ class KnowledgeBaseDAG:
         else:
             self.rules[tuple(rpn_key)] = [tuple(rpn_value)]
 
+        if tuple(rpn_value) in self.rev_rules:
+            self.rev_rules[tuple(rpn_value)].append(tuple(rpn_key))
+        else:
+            self.rev_rules[tuple(rpn_value)] = [tuple(rpn_key)]
+
     # def update_fact(self, fact: str, negated: bool = False):
     #     self.negated[fact] = negated
 
@@ -35,6 +41,11 @@ class KnowledgeBaseDAG:
         for fact in facts.replace(" ", ""):
             if fact.isalpha() and fact not in self.facts:
                 self.facts.append(fact)
+
+    def get_key(self, element: tuple, dic: dict):
+        for key, value in dic.items():
+            if element in value:
+                return key
 
     # def get_rules_for_fact(self, fact: str):
     #     return self.rules.get(fact, set())
@@ -240,3 +251,14 @@ def is_valid_expression(tokens):
 
     # Check if the number of operators is one less than the number of operands
     return operand_count == operator_count + 1
+
+def is_expression(element: Tuple):
+    binary_operators = ['+', '|', '^']
+    valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+
+    for token in element:
+        if token in binary_operators:
+            return True
+    return False
+
