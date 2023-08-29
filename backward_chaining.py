@@ -91,8 +91,12 @@ def eval_rules_with_facts(kb: KnowledgeBaseDAG, visited=None):
         eval_key(kb, kb.rules, key_tuple, visited)
 
         print_colored_text(f'eval for REV rules with fact {fact}', 'YELLOW')
-        key_tuple = find_query_in_keys(kb.rev_rules, fact)
-        eval_key(kb, kb.rev_rules, key_tuple, visited)
+        key_lst = find_query_in_keys2(kb.rev_rules, fact)
+        print(f'key_lst: {key_lst}')
+        eval_key2(kb, kb.rev_rules, key_lst, visited)
+
+        #key_tuple = find_query_in_keys(kb.rev_rules, fact)
+        #eval_key(kb, kb.rev_rules, key_tuple, visited)
 
 def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     stack = []
@@ -148,6 +152,19 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     return eval_result
     #return stack.pop()
 
+def find_query_in_keys2(rules, query):
+    key_lst = []
+    for key_tuple, _ in rules.items():
+        if query in key_tuple:
+            print('query in keys:', query)
+            key_lst.append(key_tuple)
+            if key_tuple + ('!',) in rules.keys():
+                return "ERROR"
+            if '|' in key_tuple:
+                print("or in conclusion", key_tuple)
+            if '^' in key_tuple:
+                print("xor in conclusion", key_tuple)
+    return key_lst
 
 def find_query_in_keys(rules, query):
     for key_tuple, _ in rules.items():
@@ -195,6 +212,52 @@ def eval_expr(kb: KnowledgeBaseDAG, rules, query, visited=None):
         return False
     return eval_key(kb, rules, key_tuple, visited)
     #return False
+
+def eval_key2(kb, rules, key_lst, visited): 
+    for key_tuple in key_lst:
+        if key_tuple:
+            elements = rules[key_tuple]
+            print_colored_text(f'\nelements in eval expr: {elements}, for key {key_tuple}', 'green')
+            #print(f'\nelements in eval expr: {elements}, for key {key_tuple}')
+            if kb.reasoning:
+                if kb.interactive:
+                    print("(expert-system) ", end='')
+                print(f"For query {query}, rule {elements} is found.")
+            for element in elements:
+                print_colored_text(f'curr element in eval expr: {element}', 'green')
+                #print(f'curr element in eval expr: {element}')
+                visited_copy = visited.copy()
+                visited_copy.add(key_tuple)
+
+                if process_elements(kb, rules, element, visited_copy) == True:
+                    print_colored_text(f'element when expr is true: {element}', 'red')
+                    print_colored_text(f'visited when expr is true: {visited_copy}', 'red')
+                    key = kb.get_key(element, rules)
+                    print_colored_text(f'key for element when expr is true: {key}', 'red')
+                    if is_expression(key):
+                        print(f'key is expr')
+                        #eval_expr(kb, query, element)
+                        #eval_key(kb, key, visited)
+                    else:
+                        print(f'{key} is added as A fact')
+                        kb.add_facts(key[0])
+
+                    if (len(key_tuple) == 2 and key_tuple[1] == '!'):
+                        return False
+                    return True
+                else:
+                    key = kb.get_key(element, rules)
+                    print(f'expr is false: {element} for key {key}')
+                    if is_expression(key):
+                        print(f'key is expr')
+                    else:
+                        if key[0] in kb.facts:
+                            print(f'{key} is added as A fact Re')
+                            kb.add_facts(key[0])
+                    
+        visited.add(key_tuple)
+
+    return False
 
 def eval_key(kb, rules, key_tuple, visited): 
     if key_tuple:
