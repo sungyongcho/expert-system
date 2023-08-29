@@ -17,5 +17,7 @@ A + B <=> C 	# A and B if and only if not C
 ?GVX 			# Queries : What are G, V and X ?
 
 
+# ABCDEFGH XYVW
+
 # True           False
-# ABCDEVX          F
+# ABCDEGHVXYZ          FW
