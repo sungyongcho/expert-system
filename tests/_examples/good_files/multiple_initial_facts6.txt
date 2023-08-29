@@ -1,0 +1,9 @@
+A + B => E #
+C + D => F #
+
+=ABDC
+?EF
+
+# Result should be E: True F: True
+# assertions
+# =ABECDFGHIZ

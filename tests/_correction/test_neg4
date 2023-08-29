@@ -1,0 +1,6 @@
+B + !C => A
+
+=BC
+
+?A
+# Result should be A:False

@@ -1,0 +1,9 @@
+A => B
+B <=> D
+A | C => D
+
+=C
+
+?DB
+
+# Result should be D:True B: True

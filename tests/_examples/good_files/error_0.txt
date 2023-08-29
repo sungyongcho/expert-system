@@ -1,0 +1,6 @@
+A => !B
+
+=AB
+?B
+
+# Result should be B: Error (Wrong)

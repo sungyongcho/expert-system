@@ -1,6 +1,0 @@
-# Error Syntax 2
-
-B => A + C => D
-
-# Result should be
-# Error

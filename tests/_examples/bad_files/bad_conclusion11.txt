@@ -1,0 +1,3 @@
+A => E ^ X
+
+# Not handling error !!!!!!!!!!!IMPORTANT!!!!!!!!!!!

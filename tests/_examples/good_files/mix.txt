@@ -1,0 +1,12 @@
+!(A + B) ^ (D | K) => P # P is False
+X | (A | K ^ Z) => N # N is True
+!T + !X => G # G is true
+!L => M # M is True
+
+  =AD
+?GTXMNP
+
+# Result should be G: True, T: False, X: False, M: True, N: True, P: False (Wrong)
+
+# assertions
+# =ADFNGM

@@ -1,0 +1,6 @@
+!A => !E
+X => !A + B
+
+=X
+?E
+# Result should be E: False

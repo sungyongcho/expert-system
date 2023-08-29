@@ -1,0 +1,7 @@
+# Error Syntax 3
+
+B => A
+
+=B
+??A
+# Result should be Error

@@ -1,0 +1,13 @@
+((((((((((A)))))))))) => C # C is True
+A + !(B) => D # D is False
+(D | E) => W # W is False
+!(!(!C) ^ !(!F)) => G # G is true
+(((!E ^ (D + A + B)))) => F # F is true
+(E + ((!C | F)) + A) + B ^ (A + F) => Z # Z is True
+
+=AB
+?CDWGFZ
+# Result should be {'C': True, 'D': False, 'W': False, 'G': True, 'F': True, 'Z': True} (Wrong)
+
+# assertions
+# =ABCGFZ
