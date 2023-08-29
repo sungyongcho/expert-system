@@ -1,0 +1,9 @@
+C <=> D  # C and D are True
+C <=> F  # C and F are True
+
+=F
+?FCD
+# Result should be F: True C: True D: True
+
+# assertions
+# =FCD

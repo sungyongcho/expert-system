@@ -1,0 +1,4 @@
+S | D ^ P | S => A
+=S
+?A
+# Result should be A: False (Wrong)

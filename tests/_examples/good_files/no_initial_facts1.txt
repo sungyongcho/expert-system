@@ -1,0 +1,7 @@
+A + B => C # C is False
+=
+?C
+
+# Result should be C: False
+# assertions
+# =

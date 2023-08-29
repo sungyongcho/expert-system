@@ -1,0 +1,4 @@
+!A => D
+=A
+?D
+# Result should be D: False

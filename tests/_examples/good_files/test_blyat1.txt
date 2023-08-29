@@ -1,0 +1,8 @@
+A + B + C => E
+X => B + C
+X => A
+
+=X
+
+?E
+# Result should be E: True
