@@ -210,22 +210,19 @@ ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ+|^!()"
 def is_valid_string(s, allowed_chars):
     return all(c in allowed_chars for c in s)
 
-
 def is_parentheses_balanced(expression):
     stack = []
     opening_parentheses = "("
     closing_parentheses = ")"
-    matching_parentheses = {")": "("}
-    # Check if paerenthesis character exists
-    if not (opening_parentheses in expression or closing_parentheses in expression):
-        return True
 
-    for char in expression:
-        if char in opening_parentheses:
-            stack.append(char)
-        elif char in closing_parentheses:
-            if not stack or stack.pop() != matching_parentheses[char]:
+    for token in expression:
+        if token == opening_parentheses:
+            stack.append(token)
+        elif token == closing_parentheses:
+            if not stack or len(stack) > 0 and stack[-1] == opening_parentheses:
                 return False
+            else:
+                stack.pop()
 
     return len(stack) == 0
 
