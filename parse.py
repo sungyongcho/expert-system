@@ -254,11 +254,23 @@ def is_valid_expression(tokens):
 
 def is_expression(element: Tuple):
     binary_operators = ['+', '|', '^']
-    valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-
 
     for token in element:
         if token in binary_operators:
             return True
     return False
 
+def has_only_conjunctions(element: Tuple):
+    binary_operators = ['|', '^']
+    for token in element:
+        if token in binary_operators:
+            return False
+    return True
+
+def get_operands(element: Tuple):
+    valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    operands_lst = []
+    for token in element:
+        if token in valid_operands:
+            operands_lst.append(token)
+    return operands_lst
