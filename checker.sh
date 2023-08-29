@@ -87,8 +87,8 @@ run() {
 
 	dictionary_strings=$(echo -e $dictionary_strings)
 	if [ "$verbose" = "true" ]; then
-		echo -e "mine: $dictionary_strings\n"
-		echo -e "real: $output"
+		echo -e "\nmine:\n\n$dictionary_strings"
+		echo -e "\nreal:\n\n$output"
 	fi
 
 	if [ "$dictionary_strings" = "$output" ]; then
