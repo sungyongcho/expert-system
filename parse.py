@@ -1,5 +1,5 @@
 from functools import partial
-import re
+import re, sys
 from typing import Tuple, List, Dict
 
 from collections import defaultdict
@@ -173,10 +173,10 @@ def distribute_negation(tokens):
 
 def convert_to_rpn(regex):
     """Converts a regular expression to Reverse Polish Notation (RPN)"""
-    print("===============", regex)
+    print("===============", regex, file=sys.stderr)
     regex = distribute_negation(regex)
-    print("222222222222222", regex)
-    precedence = {'!': 3, '+': 2, '|': 1, '^': 4}  # corrected precedences
+    print("222222222222222", regex, file=sys.stderr)
+    precedence = {'!': 4, '+': 3, '|': 2, '^': 1}  # corrected precedences
     rpn_tokens = []
     operator_stack = []
 
