@@ -1,4 +1,4 @@
-from parse import KnowledgeBaseDAG, is_expression, has_only_conjunctions, get_operands
+from parse import KnowledgeBaseDAG, is_expression, is_negation, has_only_conjunctions, get_operands
 import sys
 
 class TextColors:
@@ -43,12 +43,26 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
                 if kb.interactive:
                     print("(expert-system) ", end='')
                 print(f"Contradiction found in the rule {fact}.")
-            results[fact] = "Error"
-            continue
+            # results[fact] = "Error"
+            return "Error"
+            # continue
     # return results
             # return 'ERROR'
         print_colored_text(f'value_lst: {value_lst} for fact {fact}', 'magenta')
-        eval_expression(kb, value_lst)
+        eval_results = eval_expression(kb, value_lst)
+        print(f'eval_expression result: {eval_results}', file=sys.stderr)
+        for key, value in eval_results.items():
+            if value == "ERROR":
+                if kb.reasoning:
+                    if kb.interactive:
+                        print("(expert-system) ", end='')
+                    print(f"Contradiction found in the rule {fact}.")
+                # results[fact] = "Error"
+                return "Error"
+
+        # for key, value in eval_results.items():
+        #     print(f'result: {key}', file=sys.stderr)
+        #     results[fact] = value 
 
         #print_colored_text(f'eval for REV rules with fact {fact}', 'YELLOW')
         ##key_lst = find_query_in_keys2(kb.rev_rules, fact)
@@ -116,20 +130,50 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     print_colored_text(f'key: {key} is {eval_result} after evaluating expresion: {elements}', 'red')
     if eval_result == True and key[0] not in kb.facts:
         if not is_expression(key):
-            print_colored_text(f'adding key {key} as a fact after evaluating', 'yellow')
             print(kb.facts, file=sys.stderr)
-            kb.add_facts(key[0])
+            for i, elem in enumerate(key):
+                if i + 1 < len(key) and key[i + 1] != '!':
+                    kb.add_facts(elem)
+            # print_colored_text(f'adding key {key[0]} as a fact after evaluating', 'yellow')
+            # kb.add_facts(key[0])
+            print(kb.facts, file=sys.stderr)
         elif is_expression(key):
             if has_only_conjunctions(key):
                 operands_lst = get_operands(key)
                 print_colored_text(operands_lst, 'yellow')
-                for operand in operands_lst:
-                    kb.add_facts(operand)
+                for i, operand in enumerate(operands_lst):
+                    print(f'curr operand: {operand}', file=sys.stderr)
+                    if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
+                        pass
+                    else:
+                        kb.add_facts(operand)
                 print(kb.facts, file=sys.stderr)
             # else:
             #     eval_expression(kb, key)
     ### forward 결과가 false이고 key 값이 !인 경우
-    # elif eval_result == False and 
+    elif eval_result == False and is_negation(key):
+        print_colored_text(f'negation in key: {key} {len(key)} when result is {eval_result}', 'red')
+        for i, elem in enumerate(key):
+            if i + 1 < len(key) and key[i + 1] == '!':
+                kb.add_facts(elem)
+    elif eval_result == False and not is_negation(key):
+        pass
+    elif eval_result == True and key[0] in kb.facts:
+        if not is_expression(key):
+            print(kb.facts, file=sys.stderr)
+            for i, elem in enumerate(key):
+                if i + 1 < len(key) and key[i + 1] == '!':
+                    return "ERROR"
+        elif is_expression(key):
+            if has_only_conjunctions(key):
+                operands_lst = get_operands(key)
+                print_colored_text(operands_lst, 'yellow')
+                for i, operand in enumerate(operands_lst):
+                    print(f'curr operand: {operand}', file=sys.stderr)
+                    if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
+                        return "ERROR"
+    else:
+        return "ERROR"
     return eval_result
     #return stack.pop()
 
@@ -208,52 +252,6 @@ def eval_expr(kb: KnowledgeBaseDAG, rules, query, visited=None):
     return eval_key(kb, rules, key_tuple, visited)
     #return False
 
-def eval_key2(kb, rules, key_lst, visited): 
-    for key_tuple in key_lst:
-        if key_tuple:
-            elements = rules[key_tuple]
-            print_colored_text(f'\nkeys in eval expr: {key_tuple}', 'green')
-            if kb.reasoning:
-                if kb.interactive:
-                    print("(expert-system) ", end='')
-                # print(f"For query {query}, rule {elements} is found.")
-            for element in key_tuple:
-                print_colored_text(f'curr element in eval expr: {element}', 'green')
-                #print(f'curr element in eval expr: {element}')
-                visited_copy = visited.copy()
-                visited_copy.add(key_tuple)
-
-                if process_elements(kb, rules, element, visited_copy) == True:
-                    print_colored_text(f'element when expr is true: {element}', 'red')
-                    print_colored_text(f'visited when expr is true: {visited_copy}', 'red')
-                    key = kb.get_key(element, rules)
-                    print_colored_text(f'key for element when expr is true: {key}', 'red')
-                    if is_expression(key):
-                        print(f'key is expr', file=sys.stderr)
-                        #eval_expr(kb, query, element)
-                        #eval_key(kb, key, visited)
-                    else:
-                        if key[0] not in kb.facts:
-                            print_colored_text(f'{key} is added as A fact', 'yellow')
-                            kb.add_facts(key[0])
-
-                    if (len(key_tuple) == 2 and key_tuple[1] == '!'):
-                        return False
-                    return True
-                else:
-                    key = kb.get_key(element, rules)
-                    print(f'expr is false: {element} for key {key}', file=sys.stderr)
-                    if is_expression(key):
-                        print(f'key is expr', file=sys.stderr)
-                    else:
-                        if key[0] in kb.facts:
-                            print(f'{key} is added as A fact Re')
-                            kb.add_facts(key[0])
-                    
-        visited.add(key_tuple)
-
-    return False
-
 def eval_key_lst(kb, rules, key_lst, visited): 
     for key_tuple in key_lst:
         if key_tuple:
@@ -282,7 +280,7 @@ def eval_key_lst(kb, rules, key_lst, visited):
                     else:
                         print(f'{key} is added as A fact')
                         kb.add_facts(key[0])
-
+                    print(f'key_tuple in eval_key: {key_tuple}', file=sys.stderr)
                     if (len(key_tuple) == 2 and key_tuple[1] == '!'):
                         return False
                     return True
@@ -324,12 +322,13 @@ def eval_key(kb, rules, key_tuple, visited):
                     print(f'key is expr', file=sys.stderr)
                     #eval_expr(kb, query, element)
                     #eval_key(kb, key, visited)
-                else:
-                    if key[0] not in kb.facts:
-                            print_colored_text(f'{key} is added as A fact', 'yellow')
-                            kb.add_facts(key[0])
-
-                if (len(key_tuple) == 2 and key_tuple[1] == '!'):
+                # else:
+                #     if key[0] not in kb.facts:
+                #             print_colored_text(f'{key} is added as A fact', 'yellow')
+                #             kb.add_facts(key[0])
+                print(f'key_tuple in eval_key: {key_tuple}', file=sys.stderr)
+                # if (len(key_tuple) == 2 and key_tuple[1] == '!'):
+                if (len(key) >= 2 and key[1] == '!'):
                     return False
                 return True
             else:

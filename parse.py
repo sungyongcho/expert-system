@@ -314,13 +314,10 @@ def is_expression(element: Tuple):
     return False
 
 def is_negation(element: Tuple):
-    binary_operators = ['+', '|', '^']
-    valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-
-    has_only_conjunctions(element)
-    for token in element:
-        if token in binary_operators:
-            return True
+    if has_only_conjunctions(element):
+        for token in element:
+            if token == '!':
+                return True
     return False
 
 def has_only_conjunctions(element: Tuple):
@@ -335,6 +332,6 @@ def get_operands(element: Tuple):
     valid_operands = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     operands_lst = []
     for token in element:
-        if token in valid_operands:
+        if token in valid_operands or token == '!':
             operands_lst.append(token)
     return operands_lst

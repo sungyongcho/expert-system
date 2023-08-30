@@ -3,4 +3,4 @@ A => !B + !C
 =ABC
 ?B
 
-# Result should be B: Error (Wrong)
+# Result should be Error (Wrong)
