@@ -7,7 +7,7 @@ A + !(B) => D # D is False
 
 =AB
 ?CDWGFZ
-# Result should be {'C': True, 'D': False, 'W': False, 'G': True, 'F': True, 'Z': True} (Wrong)
+# Result should be C: True, D: False, W: False, G: True, F: True, Z: True (Wrong)
 
 # assertions
 # =ABCGFZ

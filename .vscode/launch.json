@@ -6,7 +6,8 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["tests/or_xor_conclusion.txt"],
+    //   "args": ["tests/or_xor_conclusion.txt"],
+      "args": ["tests/_correction/test_neg5"],
       "cwd": "${workspaceFolder}",
     }
   ]
