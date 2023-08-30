@@ -1,0 +1,19 @@
+B => A 
+C => A 
+
+
+=
+?A 
+# Result A: False. 
+
+=B
+?A 
+# Result A: True
+
+=C
+?A 
+# Result A: True
+
+=BC
+?A 
+# Result A: True

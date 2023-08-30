@@ -1,0 +1,16 @@
+B => A 
+D + E => B 
+G + H => F 
+I + J => G 
+G => H 
+L + M => K 
+O + P => L + N 
+N => M 
+
+=DEIJOP
+?AFKP 
+# Result A: True, F: True, K: True, P: True
+
+=DEIJP
+?AFKP 
+# Result A: True, F: True, K: False, P: True

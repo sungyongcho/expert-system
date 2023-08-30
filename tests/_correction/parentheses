@@ -1,0 +1,47 @@
+A | B + C => E 
+(F | G) + H => E 
+
+
+=
+?E 
+# Result E: False. 
+
+=A
+?E 
+# Result E: True
+
+=B
+?E 
+# Result E: False. 
+
+=C
+?E 
+# Result E: False. 
+
+=AC
+?E 
+# Result E: True. 
+
+=BC
+?E 
+# Result E: True
+
+=F
+?E 
+# Result E: False. 
+
+=G
+?E 
+# Result E: False. 
+
+=H
+?E 
+# Result E: False. 
+
+=FH
+?E 
+# Result E: True
+
+=GH
+?E 
+# Result E: True
