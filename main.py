@@ -82,9 +82,11 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                 else:
                     ##########################
                     result = forward_chaining(kb)
-                    print('result:', result)
+                    #print('result:', result)
                     if result != "ERROR":
                         result = eval_query(kb, query)
+                    if kb.interactive:
+                        print("(expert-system) ", end='')
                     print(f"The result of the query '{query}' is {result}.")
             elif command == "exit":
                 break
@@ -92,6 +94,8 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                 print("Unknown command. Type 'help' for available commands.")
     except KeyboardInterrupt:
         print("\nCtrl+C detected. Exiting interactive mode.")
+    except EOFError:
+        print("\nCtrl+D detected. Exiting interactive mode.")
 
 
 def main():

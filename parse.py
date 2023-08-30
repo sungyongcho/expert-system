@@ -178,9 +178,7 @@ def distribute_negation(tokens):
 
 def convert_to_rpn(regex):
     """Converts a regular expression to Reverse Polish Notation (RPN)"""
-    print("===============", regex, file=sys.stderr)
     # regex = distribute_negation(regex)
-    print("222222222222222", regex, file=sys.stderr)
     precedence = {'!': 4, '+': 3, '|': 2, '^': 1}  # corrected precedences
     rpn_tokens = []
     operator_stack = []
@@ -218,7 +216,6 @@ def check_valid_rule(line, delim):
         return -2
     left = tokenize_expr(left.strip())
     right = tokenize_expr(right.strip())
-    print("aaa", left, right, file=sys.stderr)
     if not (is_valid_string(left, ALLOWED_CHARS) and is_valid_string(right, ALLOWED_CHARS)):
         return -3
     if not (has_valid_parenthesis(left) and has_valid_parenthesis(right)):

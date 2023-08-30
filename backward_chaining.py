@@ -137,7 +137,7 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
 def check_eval_result(kb, key, eval_result):
     if eval_result == True and key[0] not in kb.facts:
         if not is_expression(key):
-            print(kb.facts, file=sys.stderr)
+            #print(kb.facts, file=sys.stderr)
             # for i, elem in enumerate(elements):
             #     # print(elem, key)
             #     if i + 1 <= len(elements) and elements[i + 1] == '!' and elem == key[0]:
@@ -150,22 +150,25 @@ def check_eval_result(kb, key, eval_result):
                 kb.add_facts(key[0])
             # print_colored_text(f'adding key {key[0]} as a fact after evaluating', 'yellow')
             # kb.add_facts(key[0])
-            print(kb.facts, file=sys.stderr)
+            #print(kb.facts, file=sys.stderr)
         elif is_expression(key):
             if has_only_conjunctions(key):
                 operands_lst = get_operands(key)
-                print_colored_text(operands_lst, 'yellow')
+                #print_colored_text(operands_lst, 'yellow')
                 for i, operand in enumerate(operands_lst):
-                    print(f'curr operand: {operand}', file=sys.stderr)
+                    #print(f'curr operand: {operand}', file=sys.stderr)
                     if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
                         pass
                     else:
                         kb.add_facts(operand)
-                print(kb.facts, file=sys.stderr)
+                #print(kb.facts, file=sys.stderr)
             # else:
             #     eval_expression(kb, key)
     elif eval_result == False and is_negation(key):
-        print_colored_text(f'negation in key: {key} {len(key)} when result is {eval_result}', 'red')
+        if kb.reasoning:
+            if kb.interactive:
+                print("(expert-system) ", end='')
+            print_colored_text(f'negation in key: {key} {len(key)} when result is {eval_result}', 'red')
         for i, elem in enumerate(key):
             if i + 1 < len(key) and key[i + 1] == '!':
                 kb.add_facts(elem)
@@ -173,16 +176,16 @@ def check_eval_result(kb, key, eval_result):
         pass
     elif eval_result == True and key[0] in kb.facts:
         if not is_expression(key):
-            print(kb.facts, file=sys.stderr)
+            #print(kb.facts, file=sys.stderr)
             for i, elem in enumerate(key):
                 if i + 1 < len(key) and key[i + 1] == '!':
                     return "ERROR"
         elif is_expression(key):
             if has_only_conjunctions(key):
                 operands_lst = get_operands(key)
-                print_colored_text(operands_lst, 'yellow')
+                #print_colored_text(operands_lst, 'yellow')
                 for i, operand in enumerate(operands_lst):
-                    print(f'curr operand: {operand}', file=sys.stderr)
+                    #print(f'curr operand: {operand}', file=sys.stderr)
                     if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
                         return "ERROR"
     else:
@@ -206,13 +209,9 @@ def find_fact_in_values(rules, fact):
 def find_query_in_keys(rules, query):
     for key_tuple, _ in rules.items():
         if query in key_tuple:
-            print('query in keys:', query, file=sys.stderr)
+            #print('query in keys:', query, file=sys.stderr)
             if key_tuple + ('!',) in rules.keys():
                 return "ERROR"
-            if '|' in key_tuple:
-                print("or in conclusion", key_tuple, file=sys.stderr)
-            if '^' in key_tuple:
-                print("xor in conclusion", key_tuple, file=sys.stderr)
             return key_tuple
     return None
 
@@ -225,7 +224,6 @@ def eval_expr(kb: KnowledgeBaseDAG, rules, query, visited=None):
             if kb.interactive:
                 print("(expert-system) ", end='')
             print(f"Symbol {query} is in facts list, so it is true")
-        print(f'{query} is a fact', file=sys.stderr)
         return True
 
     # if query in rules:
@@ -253,7 +251,10 @@ def eval_expr(kb: KnowledgeBaseDAG, rules, query, visited=None):
 def eval_key(kb, rules, key_tuple, visited): 
     if key_tuple:
         elements = rules[key_tuple]
-        print_colored_text(f'\nelements in eval expr: {elements}, for key {key_tuple}', 'green')
+        if kb.reasoning:
+            if kb.interactive:
+                print("(expert-system) ", end='')
+            print_colored_text(f'elements in eval expr: {elements}, for key {key_tuple}', 'green')
         #print(f'\nelements in eval expr: {elements}, for key {key_tuple}')
         if kb.reasoning:
             if kb.interactive:
@@ -282,19 +283,22 @@ def eval_key(kb, rules, key_tuple, visited):
                 #     if key[0] not in kb.facts:
                 #             print_colored_text(f'{key} is added as A fact', 'yellow')
                 #             kb.add_facts(key[0])
-                print(f'key_tuple in eval_key: {key_tuple}', file=sys.stderr)
+                #print(f'key_tuple in eval_key: {key_tuple}', file=sys.stderr)
                 # if (len(key_tuple) == 2 and key_tuple[1] == '!'):
                 if (len(key) >= 2 and key[1] == '!'):
                     return False
                 return True
             elif process_elements_result == False:
                 key = kb.get_key(element, rules)
-                print(f'expr is false: {element} for key {key}', file=sys.stderr)
+                #print(f'expr is false: {element} for key {key}', file=sys.stderr)
                 if is_expression(key):
                     print(f'key is expr', file=sys.stderr)
                 else:
                     if key[0] in kb.facts:
-                        print_colored_text(f'{key} is added as A fact Re', 'yellow')
+                        if kb.reasoning:
+                            if kb.interactive:
+                                print("(expert-system) ", end='')
+                            print_colored_text(f'{key} is added as A fact', 'yellow')
                         kb.add_facts(key[0])
                         return True
             # elif process_elements_result == "ERROR":
@@ -305,8 +309,6 @@ def eval_key(kb, rules, key_tuple, visited):
     return False
 
 def eval_expression(kb: KnowledgeBaseDAG, queries):
-    print('eval expression:', queries, file=sys.stderr)
-
     results = {}
     for query in queries:
         if kb.reasoning:
@@ -325,7 +327,6 @@ def eval_expression(kb: KnowledgeBaseDAG, queries):
 
 
 def eval_query(kb: KnowledgeBaseDAG, queries):
-    print('queries:', queries, file=sys.stderr)
     if kb.reasoning is True:
         if kb.interactive:
             print("(expert-system) ", end='')
@@ -337,7 +338,6 @@ def eval_query(kb: KnowledgeBaseDAG, queries):
             if kb.interactive:
                 print("(expert-system) ", end='')
             print(f"Evaluating query {query}")
-        print('curr query:', query, file=sys.stderr)
         query_result = eval_expr(kb, kb.rules, query)
         if kb.reasoning:
             if kb.interactive:
