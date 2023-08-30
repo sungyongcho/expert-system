@@ -84,7 +84,7 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                     result = forward_chaining(kb)
                     print('result:', result)
                     if result != "ERROR":
-                        result = kb.eval_query(query)
+                        result = eval_query(kb, query)
                     print(f"The result of the query '{query}' is {result}.")
             elif command == "exit":
                 break
