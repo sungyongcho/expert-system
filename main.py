@@ -132,6 +132,9 @@ def main():
                     print("Error in syntax:",
                           f"[{input_line.strip()}]", f"{queries}")
                     exit()
+                elif queries is None and not (kb.facts_given is True and kb.query_given is True):
+                    print("Error: query or facts not given")
+                    exit()
                 elif queries is not None:
                     # print(kb)
                     ##########################

@@ -1,5 +1,6 @@
 from functools import partial
-import re, sys
+import re
+import sys
 from typing import Tuple, List, Dict
 
 from collections import defaultdict
@@ -12,6 +13,8 @@ class KnowledgeBaseDAG:
         self.facts = []
         self.reasoning = False
         self.interactive = False
+        self.query_given = False
+        self.facts_given = False
         # self.negated = defaultdict(bool)
 
     def add_rule(self, rule: str, result: str):
@@ -97,6 +100,7 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
 
     if line.startswith("="):
         if len(line) > 1 and all(character.isupper() for character in line[1:]):
+            kb.facts_given = True
             facts = line[1:].strip()
             kb.set_facts(facts)
         elif len(line) == 1:
@@ -104,6 +108,7 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
         else:
             return -100
     elif line.startswith("?") and all(character.isupper() for character in line[1:]):
+        kb.query_given = True
         queries = line[1:].strip()
         return queries
     elif "<=>" in line:
@@ -313,12 +318,14 @@ def is_expression(element: Tuple):
             return True
     return False
 
+
 def is_negation(element: Tuple):
     if has_only_conjunctions(element):
         for token in element:
             if token == '!':
                 return True
     return False
+
 
 def has_only_conjunctions(element: Tuple):
     binary_operators = ['|', '^']
