@@ -1,5 +1,5 @@
-A + B => C + D + U # A, B, C and D are True
-L + E + Z + W <=> F # F, L and E are true
+A + B => C + D + U		# A, B, C and D are True
+L + E + Z + W <=> F		# F, L and E are true
 Y <=> F
 
 =ABF
@@ -7,3 +7,8 @@ Y <=> F
 
 # assertions
 # =ABFCDLEZWUY
+
+# True     False
+# CDULEZWY
+
+# Result should be F: True, C: True, D: True, U: True, L: True

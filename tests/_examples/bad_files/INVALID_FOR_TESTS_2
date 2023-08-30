@@ -5,3 +5,4 @@ A | C => D
 =C
 
 ?D
+#Result should be Error

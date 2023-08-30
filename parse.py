@@ -218,7 +218,7 @@ def check_valid_rule(line, delim):
         return -2
     left = tokenize_expr(left.strip())
     right = tokenize_expr(right.strip())
-    print("aaa", left, right)
+    print("aaa", left, right, file=sys.stderr)
     if not (is_valid_string(left, ALLOWED_CHARS) and is_valid_string(right, ALLOWED_CHARS)):
         return -3
     if not (has_valid_parenthesis(left) and has_valid_parenthesis(right)):
