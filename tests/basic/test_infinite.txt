@@ -4,3 +4,5 @@ E => A
 
 =
 ?A
+
+# Result A: False

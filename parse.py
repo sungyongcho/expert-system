@@ -179,7 +179,7 @@ def distribute_negation(tokens):
 def convert_to_rpn(regex):
     """Converts a regular expression to Reverse Polish Notation (RPN)"""
     print("===============", regex, file=sys.stderr)
-    regex = distribute_negation(regex)
+    # regex = distribute_negation(regex)
     print("222222222222222", regex, file=sys.stderr)
     precedence = {'!': 4, '+': 3, '|': 2, '^': 1}  # corrected precedences
     rpn_tokens = []

@@ -9,4 +9,4 @@ A => D
 =AEBC
 
 ?Z
-# should give True
+# Result should give Z: True
