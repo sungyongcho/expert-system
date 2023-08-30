@@ -1,0 +1,7 @@
+A => B ^ C
+#A + B => C
+
+=B
+?ABC
+
+# Result should be A:True B:True C:True
