@@ -218,6 +218,7 @@ def check_valid_rule(line, delim):
         return -2
     left = tokenize_expr(left.strip())
     right = tokenize_expr(right.strip())
+    print("aaa", left, right)
     if not (is_valid_string(left, ALLOWED_CHARS) and is_valid_string(right, ALLOWED_CHARS)):
         return -3
     if not (has_valid_parenthesis(left) and has_valid_parenthesis(right)):
@@ -226,6 +227,15 @@ def check_valid_rule(line, delim):
         return -5
     if not (is_valid_expression(left) and is_valid_expression(right)):
         return -6
+
+    left_negation = left.copy()
+    right_negation = right.copy()
+    left_negation.insert(0, '!')
+    right_negation.insert(0, '!')
+    if left_negation == right:
+        return -7
+    if left == right_negation:
+        return -8
     return left, right
 
 
