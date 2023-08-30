@@ -99,8 +99,8 @@ def parse_oneline(kb: KnowledgeBaseDAG, line: str) -> str:
         return
 
     if line.startswith("="):
+        kb.facts_given = True
         if len(line) > 1 and all(character.isupper() for character in line[1:]):
-            kb.facts_given = True
             facts = line[1:].strip()
             kb.set_facts(facts)
         elif len(line) == 1:
