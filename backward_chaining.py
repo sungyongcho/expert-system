@@ -131,9 +131,16 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     if eval_result == True and key[0] not in kb.facts:
         if not is_expression(key):
             print(kb.facts, file=sys.stderr)
-            for i, elem in enumerate(key):
-                if i + 1 < len(key) and key[i + 1] != '!':
-                    kb.add_facts(elem)
+            # for i, elem in enumerate(elements):
+            #     # print(elem, key)
+            #     if i + 1 <= len(elements) and elements[i + 1] == '!' and elem == key[0]:
+            #         return "ERROR"
+            if is_negation(key):
+                for i, elem in enumerate(key):
+                    if i + 1 < len(key) and key[i + 1] != '!':
+                        kb.add_facts(elem)
+            else:
+                kb.add_facts(key[0])
             # print_colored_text(f'adding key {key[0]} as a fact after evaluating', 'yellow')
             # kb.add_facts(key[0])
             print(kb.facts, file=sys.stderr)
@@ -313,7 +320,8 @@ def eval_key(kb, rules, key_tuple, visited):
             visited_copy = visited.copy()
             visited_copy.add(key_tuple)
 
-            if process_elements(kb, rules, element, visited_copy) == True:
+            process_elements_result = process_elements(kb, rules, element, visited_copy)
+            if process_elements_result == True:
                 print_colored_text(f'element when expr is true: {element}', 'red')
                 print_colored_text(f'visited when expr is true: {visited_copy}', 'red')
                 key = kb.get_key(element, rules)
@@ -331,7 +339,7 @@ def eval_key(kb, rules, key_tuple, visited):
                 if (len(key) >= 2 and key[1] == '!'):
                     return False
                 return True
-            else:
+            elif process_elements_result == False:
                 key = kb.get_key(element, rules)
                 print(f'expr is false: {element} for key {key}', file=sys.stderr)
                 if is_expression(key):
@@ -340,6 +348,9 @@ def eval_key(kb, rules, key_tuple, visited):
                     if key[0] in kb.facts:
                         print_colored_text(f'{key} is added as A fact Re', 'yellow')
                         kb.add_facts(key[0])
+                        return True
+            # elif process_elements_result == "ERROR":
+            #     return "ERROR"
                 
     visited.add(key_tuple)
 
