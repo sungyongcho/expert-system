@@ -145,27 +145,28 @@ def distribute_negation(tokens):
     distributed_tokens = []
     distribute = False
 
-    for token in tokens:
-        if token == '!':
-            distribute = True
-        elif token == '(':
-            if distribute:
-                distributed_tokens.append(token)
-                continue
+    for i in range(len(tokens)):
+        if tokens[i] == '!':
+            if i+1 < len(tokens) and tokens[i+1] == '(':
+                distribute = True
             else:
-                distributed_tokens.append(token)
-        elif token == ')':
+                distributed_tokens.append(tokens[i])
+        elif tokens[i] == '(':
+            distributed_tokens.append(tokens[i])
+        elif tokens[i] == ')':
             if distribute:
                 distribute = False
-            distributed_tokens.append(token)
-        elif (token.isupper() or token.islower()) and distribute:  # assuming operands are alphabets
-            distributed_tokens.extend(['!', token])
-        elif token == '+' and distribute:
+            distributed_tokens.append(tokens[i])
+        # assuming operands are alphabets
+        elif (tokens[i].isupper() or tokens[i].islower()) and distribute:
+            distributed_tokens.extend(['!', tokens[i]])
+        elif tokens[i] == '+' and distribute:
             distributed_tokens.append('|')
-        elif token == '|' and distribute:
+        elif tokens[i] == '|' and distribute:
             distributed_tokens.append('+')
         else:
-            distributed_tokens.append(token)
+            if not distribute:
+                distributed_tokens.append(tokens[i])
 
     return distributed_tokens
 
@@ -175,46 +176,30 @@ def convert_to_rpn(regex):
     print("===============", regex)
     regex = distribute_negation(regex)
     print("222222222222222", regex)
-    precedence = {'!': 3, '&': 2, '|': 1, '^': 1}
+    precedence = {'!': 3, '+': 2, '|': 1, '^': 4}  # corrected precedences
     rpn_tokens = []
     operator_stack = []
-    negation_counter = 0
 
-    idx = 0
-    while idx < len(regex):
-        token = regex[idx]
-
-        if token == '!':
-            negation_counter += 1
-            idx += 1
-            continue
-
-        if token == '(':
+    for token in regex:
+        if token.isupper():  # Operand
+            rpn_tokens.append(token)
+        elif token == '!':
+            operator_stack.append(token)
+        elif token == '(':
             operator_stack.append(token)
         elif token == ')':
-            while operator_stack and operator_stack[-1] != '(':
+            while operator_stack[-1] != '(':
                 rpn_tokens.append(operator_stack.pop())
-            operator_stack.pop()  # Discard the left parenthesis
+            operator_stack.pop()  # Discard left parenthesis from stack
         else:
-            if token.isupper():
-                # Operand (single character)
-                rpn_tokens.append(token)
-                if negation_counter % 2 != 0:
-                    rpn_tokens.append('!')
-                    negation_counter = 0
-            else:
-                while (operator_stack and
-                        operator_stack[-1] != '(' and
-                        precedence.get(operator_stack[-1], 0) >= precedence.get(token, 0)):
-                    rpn_tokens.append(operator_stack.pop())
-                operator_stack.append(token)
+            while (operator_stack and
+                   operator_stack[-1] != '(' and
+                   precedence[operator_stack[-1]] >= precedence[token]):
+                rpn_tokens.append(operator_stack.pop())
 
-            negation_counter = 0
+            operator_stack.append(token)
 
-        idx += 1
-
-    while operator_stack:
-        # Pop any remaining operators from the stack to the output
+    while operator_stack:  # Pop any remaining operators from stack into output
         rpn_tokens.append(operator_stack.pop())
 
     return ''.join(rpn_tokens)
