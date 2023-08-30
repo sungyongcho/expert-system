@@ -30,6 +30,7 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
     print_rules(kb.rules, 'magenta')
     if visited is None:
         visited = set()
+    results = {}
     for fact in kb.facts:
         print('curr fact:', fact, file=sys.stderr)
         print_colored_text(f'eval for rules with fact {fact}', 'YELLOW')
@@ -37,6 +38,15 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
         #print(f'key_lst: {key_lst}')
         #eval_key2(kb, kb.rules, key_lst, visited)
         value_lst = find_fact_in_values(kb.rules, fact)
+        if value_lst == "ERROR":
+            if kb.reasoning:
+                if kb.interactive:
+                    print("(expert-system) ", end='')
+                print(f"Contradiction found in the rule {fact}.")
+            results[fact] = "Error"
+            continue
+    # return results
+            # return 'ERROR'
         print_colored_text(f'value_lst: {value_lst} for fact {fact}', 'magenta')
         eval_expression(kb, value_lst)
 
@@ -48,6 +58,7 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
 
         #key_tuple = find_query_in_keys(kb.rev_rules, fact)
         #eval_key(kb, kb.rev_rules, key_tuple, visited)
+    return results
 
 def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     stack = []
@@ -117,6 +128,8 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
                 print(kb.facts, file=sys.stderr)
             # else:
             #     eval_expression(kb, key)
+    ### forward 결과가 false이고 key 값이 !인 경우
+    # elif eval_result == False and 
     return eval_result
     #return stack.pop()
 
@@ -124,6 +137,9 @@ def find_fact_in_values(rules, fact):
     value_lst = []
     for key_tuple, value_list in rules.items():
         #print(f'curr value_tuple {value_list} for finding fact {fact}')
+        if fact in key_tuple:
+            if key_tuple + ('!',) in rules.keys():
+                return "ERROR"
         for value_tuple in value_list:
             if fact in value_tuple:
                 #print('fact in values:', fact)

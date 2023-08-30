@@ -81,8 +81,10 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                     print("Invalid command. The query should follow after '?'.")
                 else:
                     ##########################
-                    forward_chaining(kb)
-                    result = kb.eval_query(query)
+                    result = forward_chaining(kb)
+                    print('result:', result)
+                    if result != "ERROR":
+                        result = kb.eval_query(query)
                     print(f"The result of the query '{query}' is {result}.")
             elif command == "exit":
                 break
@@ -133,8 +135,12 @@ def main():
                 elif queries is not None:
                     # print(kb)
                     ##########################
-                    forward_chaining(kb)
-                    print(eval_query(kb, queries))
+                    forward_result = forward_chaining(kb)
+                    # print('result:', len(forward_result))
+                    if len(forward_result) != 0:
+                        print(forward_result)
+                    else:
+                        print(eval_query(kb, queries))
         if args.interactive:
             interactive_mode(kb)
 
