@@ -140,8 +140,41 @@ def tokenize_expr(expr):
     return tokens
 
 
+def distribute_negation(tokens):
+    """Distributes the negation in a tokenized regular expression"""
+    distributed_tokens = []
+    distribute = False
+
+    for token in tokens:
+        if token == '!':
+            distribute = True
+        elif token == '(':
+            if distribute:
+                distributed_tokens.append(token)
+                continue
+            else:
+                distributed_tokens.append(token)
+        elif token == ')':
+            if distribute:
+                distribute = False
+            distributed_tokens.append(token)
+        elif (token.isupper() or token.islower()) and distribute:  # assuming operands are alphabets
+            distributed_tokens.extend(['!', token])
+        elif token == '+' and distribute:
+            distributed_tokens.append('|')
+        elif token == '|' and distribute:
+            distributed_tokens.append('+')
+        else:
+            distributed_tokens.append(token)
+
+    return distributed_tokens
+
+
 def convert_to_rpn(regex):
     """Converts a regular expression to Reverse Polish Notation (RPN)"""
+    print("===============", regex)
+    regex = distribute_negation(regex)
+    print("222222222222222", regex)
     precedence = {'!': 3, '&': 2, '|': 1, '^': 1}
     rpn_tokens = []
     operator_stack = []
