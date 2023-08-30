@@ -82,7 +82,6 @@ def interactive_mode(kb: KnowledgeBaseDAG):
                 else:
                     ##########################
                     result = forward_chaining(kb)
-                    #print('result:', result)
                     if result != "ERROR":
                         result = eval_query(kb, query)
                     if kb.interactive:
