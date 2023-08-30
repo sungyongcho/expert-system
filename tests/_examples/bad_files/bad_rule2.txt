@@ -1,1 +1,2 @@
 AA + B => C
+#Result should be Error

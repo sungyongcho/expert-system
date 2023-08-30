@@ -91,10 +91,21 @@ run() {
 		echo -e "\nmine:\n\n$output"
 	fi
 
-	if [ "$dictionary_strings" = "$output" ]; then
-		echo -e "${GREEN}OK${FIN}"
+	error=$(echo $output | grep -o 'Error')
+	#echo $error
+
+	if [ -z $error ]; then
+		if [ "$dictionary_strings" = "$output" ]; then
+			echo -e "${GREEN}OK${FIN}"
+		else
+			echo -e "${RED}FAIL${FIN}"
+		fi
 	else
-		echo -e "${RED}FAIL${FIN}"
+		if [ "$dictionary_strings" = "$error" ]; then
+			echo -e "${GREEN}OK${FIN}"
+		else
+			echo -e "${RED}FAIL${FIN}"
+		fi
 	fi
 }
 
@@ -109,6 +120,9 @@ check_options() {
 		test_list=$(ls $test_dir)
 	elif [ $1 == "--good" ]; then
 		test_dir="tests/_examples/good_files/"
+		test_list=$(ls $test_dir)
+	elif [ $1 == "--bad" ]; then
+		test_dir="tests/_examples/bad_files/"
 		test_list=$(ls $test_dir)
 	elif [ $1 == "--error" ]; then
 		test_dir="tests/error/"

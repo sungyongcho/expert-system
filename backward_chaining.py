@@ -34,9 +34,6 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
     for fact in kb.facts:
         print('curr fact:', fact, file=sys.stderr)
         print_colored_text(f'eval for rules with fact {fact}', 'YELLOW')
-        #key_lst = find_query_in_keys2(kb.rules, fact)
-        #print(f'key_lst: {key_lst}')
-        #eval_key2(kb, kb.rules, key_lst, visited)
         value_lst = find_fact_in_values(kb.rules, fact)
         if value_lst == "ERROR":
             if kb.reasoning:
@@ -59,19 +56,6 @@ def forward_chaining(kb: KnowledgeBaseDAG, visited=None):
                     print(f"Contradiction found in the rule {fact}.")
                 # results[fact] = "Error"
                 return "Error"
-
-        # for key, value in eval_results.items():
-        #     print(f'result: {key}', file=sys.stderr)
-        #     results[fact] = value 
-
-        #print_colored_text(f'eval for REV rules with fact {fact}', 'YELLOW')
-        ##key_lst = find_query_in_keys2(kb.rev_rules, fact)
-        #value_lst = find_fact_in_values(kb.rev_rules, fact)
-        #print(f'value_lst: {value_lst}')
-        #eval_key2(kb, kb.rev_rules, value_lst, visited)
-
-        #key_tuple = find_query_in_keys(kb.rev_rules, fact)
-        #eval_key(kb, kb.rev_rules, key_tuple, visited)
     return results
 
 def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
@@ -80,7 +64,6 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
     print(f'elements in process_elements: {elements}', file=sys.stderr)
     for index, element in enumerate(elements):
         print_colored_text(f'process element: {element}, visited: {visited}', 'blue')
-        #print('process element:', element, 'visited:', visited)
         if element == '!':
             operand = stack.pop()
             element_operand = stack_elements.pop()
@@ -183,6 +166,62 @@ def process_elements(kb: KnowledgeBaseDAG, rules, elements, visited):
         return "ERROR"
     return eval_result
     #return stack.pop()
+
+def check_eval_result(kb, key, eval_result):
+    if eval_result == True and key[0] not in kb.facts:
+        if not is_expression(key):
+            print(kb.facts, file=sys.stderr)
+            # for i, elem in enumerate(elements):
+            #     # print(elem, key)
+            #     if i + 1 <= len(elements) and elements[i + 1] == '!' and elem == key[0]:
+            #         return "ERROR"
+            if is_negation(key):
+                for i, elem in enumerate(key):
+                    if i + 1 < len(key) and key[i + 1] != '!':
+                        kb.add_facts(elem)
+            else:
+                kb.add_facts(key[0])
+            # print_colored_text(f'adding key {key[0]} as a fact after evaluating', 'yellow')
+            # kb.add_facts(key[0])
+            print(kb.facts, file=sys.stderr)
+        elif is_expression(key):
+            if has_only_conjunctions(key):
+                operands_lst = get_operands(key)
+                print_colored_text(operands_lst, 'yellow')
+                for i, operand in enumerate(operands_lst):
+                    print(f'curr operand: {operand}', file=sys.stderr)
+                    if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
+                        pass
+                    else:
+                        kb.add_facts(operand)
+                print(kb.facts, file=sys.stderr)
+            # else:
+            #     eval_expression(kb, key)
+    ### forward 결과가 false이고 key 값이 !인 경우
+    elif eval_result == False and is_negation(key):
+        print_colored_text(f'negation in key: {key} {len(key)} when result is {eval_result}', 'red')
+        for i, elem in enumerate(key):
+            if i + 1 < len(key) and key[i + 1] == '!':
+                kb.add_facts(elem)
+    elif eval_result == False and not is_negation(key):
+        pass
+    elif eval_result == True and key[0] in kb.facts:
+        if not is_expression(key):
+            print(kb.facts, file=sys.stderr)
+            for i, elem in enumerate(key):
+                if i + 1 < len(key) and key[i + 1] == '!':
+                    return "ERROR"
+        elif is_expression(key):
+            if has_only_conjunctions(key):
+                operands_lst = get_operands(key)
+                print_colored_text(operands_lst, 'yellow')
+                for i, operand in enumerate(operands_lst):
+                    print(f'curr operand: {operand}', file=sys.stderr)
+                    if i + 1 < len(operands_lst) and operands_lst[i + 1] == '!':
+                        return "ERROR"
+    else:
+        return "ERROR"
+
 
 def find_fact_in_values(rules, fact):
     value_lst = []

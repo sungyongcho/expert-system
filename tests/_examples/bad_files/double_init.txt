@@ -17,4 +17,6 @@ A + B <=> C		# A and B if and only if C
 
 =LOL
 
-?GVX			# Queries : What are G, V and X ?
+?GVX			# Queries : What are G, V and X ?#Result should be Error
+
+# Result should be Error
