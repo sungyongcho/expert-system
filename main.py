@@ -132,9 +132,6 @@ def main():
                     print("Error in syntax:",
                           f"[{input_line.strip()}]", f"{queries}")
                     exit()
-                elif queries is None and not (kb.facts_given is True and kb.query_given is True):
-                    print("Error: query or facts not given")
-                    exit()
                 elif queries is not None:
                     # print(kb)
                     ##########################
@@ -144,6 +141,14 @@ def main():
                         print(forward_result)
                     else:
                         print(eval_query(kb, queries))
+
+            current_position = f.tell()
+            end_of_file = (current_position ==
+                           os.fstat(f.fileno()).st_size)
+
+            if end_of_file and not (kb.facts_given is True and kb.query_given is True):
+                print("Error: query or facts not given")
+                exit()
         if args.interactive:
             interactive_mode(kb)
 
