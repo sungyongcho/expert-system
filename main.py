@@ -133,6 +133,9 @@ def main():
                           f"[{input_line.strip()}]", f"{queries}")
                     exit()
                 elif queries is not None:
+                    if (len(kb.rules) == 0):
+                        print("Error: No rules defined")
+                        exit()
                     # print(kb)
                     ##########################
                     forward_result = forward_chaining(kb)
