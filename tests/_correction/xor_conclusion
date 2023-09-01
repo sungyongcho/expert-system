@@ -1,7 +1,7 @@
 A => B ^ C
-#A + B => C
+B => C
 
 =B
 ?ABC
 
-# Result should be A:True B:True C:True
+# Result should be A:False B:True C:True

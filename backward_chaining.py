@@ -191,10 +191,6 @@ def find_query_in_keys(rules, query):
         if query in key_tuple:
             if key_tuple + ('!',) in rules.keys():
                 return "ERROR"
-            if "^" in key_tuple:
-                print("XOR")
-            if "|" in key_tuple:
-                print("OR")
             return key_tuple
     return None
 

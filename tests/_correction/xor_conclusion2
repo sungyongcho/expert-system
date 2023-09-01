@@ -1,0 +1,7 @@
+A => B ^ C | D
+B => C
+
+=B
+?ABCD
+
+# Result should be A:False B:True C:True D: False
