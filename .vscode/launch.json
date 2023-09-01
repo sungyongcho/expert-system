@@ -9,7 +9,7 @@
       //   "args": ["tests/or_xor_conclusion.txt"],
       //   "args": ["tests/_examples/good_files/NEGATION_SIMPLE_2"],
       //   "args": ["tests/_examples/good_files/parenthesis.txt"],
-      "args": ["tests/_correction/parentheses"],
+      "args": ["tests/_correction/xor_conclusion2", "-r"],
       //   "args": ["tests/_examples/good_files/empty_init_test.txt"],
       "cwd": "${workspaceFolder}"
     }
